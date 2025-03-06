@@ -33,3 +33,41 @@ function drawPaddle() {
     ctx.closePath() // Close the drawing path for performance optimization
 
 }
+
+
+//create the brick properties coordinates
+let bricks = []; //store bricks in array
+let brickWidth = 50
+let brickHeight = 10
+let brickRowsCount = 5
+let brickColumnCount = 8
+let brickPadding = 10
+let brickOffSetTop = 30
+let brickOffSetLeft = 30
+
+//function to draw the bricks in the game 
+function drawBricks() {
+    // loop for the column of the bricks
+    for (let cl = 0; cl < brickColumnCount; cl++) {
+        //loop to populate the row of the bricks
+        for (let rw = 0; rw < brickRowsCount; rw++) {
+            //check if the brick is still active (if status = 1 #brick is visible)
+            if (bricks[cl][rw].status === 1) {
+                //calculate the x &y axis position of the bricks
+                let brickX = cl * (brickWidth + brickPadding) + brickOffSetLeft //horizontal
+                let brickY = rw * (brickHeight + brickPadding) + brickOffSetTop //vertical
+
+                //store the above in the brick array
+                bricks[cl][rw].x = brickX
+                bricks[cl][rw].y = brickY
+
+                // Draw the brick
+                ctx.beginPath(); // Start a new path
+                ctx.rect(brickX, brickY, brickWidth, brickHeight); // Create a rectangle for the brick
+                ctx.fillStyle = "#f00"; // (red)
+                ctx.fill(); // Fill the rectangle with the chosen color
+                ctx.closePath(); // Close the drawing path
+            }
+        }
+    }
+}
