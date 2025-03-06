@@ -71,3 +71,51 @@ function drawBricks() {
         }
     }
 }
+
+// Controls
+let rightPressed = false;
+let leftPressed = false;
+let isPaused = false;
+
+document.addEventListener("keydown", keyDownHandler, false)
+document.addEventListener("keykup", keyUpHandler, false)
+
+//functions to handle the game controls (keyboard)
+//when the keys are pressed by the user
+function keyDownHandler(e) {
+    //move paddle right
+    if (e.key === "Right" || e.key === "ArrowRight") {
+        rightPressed = true
+    }
+    
+    //move paddle left
+    else if (e.key === "Left" || e.key === "ArrowLeft"){
+        leftPressed = true
+    }
+
+    //pause the game 
+    else if (e.key === "p" || e.key === "P") {
+        isPaused = true;
+    }
+    // Continue the game 
+    else if (e.key === "c" || e.key === "C") {
+        isPaused = false;
+        draw(); // Resume game loop
+    }
+    // Restart game to start the game afresh
+    else if (e.key === "r" || e.key === "R") {
+        document.location.reload(); // Reload page to restart the game
+    }
+}
+
+//when the keys are released by the user(not pressed)
+function keyUpHandler(e) {
+    if (e.key === "Right" || e.key === "ArrowRight") {
+        rightPressed =false
+    }else if ( e.key === "Left" || e.key === "ArrowRight") {
+        leftPressed = false
+    }
+}
+
+
+
