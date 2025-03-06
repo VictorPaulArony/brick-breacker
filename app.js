@@ -118,4 +118,58 @@ function keyUpHandler(e) {
 }
 
 
+<<<<<<< Updated upstream
+=======
+//function to update the game
+function update(){
+    if (rightPressed && paddleX < canvas.width - paddleWidth){
+        paddleX += 7
+    }else if (leftPressed && paddleX >0 ){
+        paddleX = 7;
+    }
+    x += dx;
+    y += dy;
+
+    //handle collision with walls
+    if (x + ballRadius > canvas.width || x - ballRadius < 0) {
+        dx = -dx;
+    } 
+    if (y-ballRadius < 0) {
+        dy = -dy;
+    }
+
+    //ball collision rith paddle and bounce
+    if (
+        y + ballRadius > canvas.height - paddleHeight - 10 &&
+        x > paddleX &&
+        x < paddleX + paddleWidth
+    ){
+        dy = -dy; // bounce off
+    }
+
+    //ball out of bound
+    if (y + ballRadius > canvas.height) {
+        alert("Game Over")
+        document.location.reload();
+    }
+    handleCollision()
+}
+
+
+function draw() {
+    if (isPaused) {
+        return; // Stop drawing if the game is paused
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+    drawBricks();
+    drawBall();
+    drawPaddle();
+    update();
+
+    requestAnimationFrame(draw); // Keep animating unless paused
+}
+ draw();
+
+>>>>>>> Stashed changes
 
