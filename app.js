@@ -5,7 +5,7 @@ const ctx = canvas.getContext("2d")
 //create the ball to be used first
 let ballRadius = 20
 let x = canvas.width / 2 // position of the ball
-let y = canvas.height - 30
+let y = canvas.height - 40
 let dy = - 2 //speed of the ball
 let dx = - 2
 
@@ -20,9 +20,9 @@ function drawBall() {
 
 //define the paddle properties(where the ball will be bouncing at during play)
 let paddleHeight = 10
-let paddleWidth = 100
+let paddleWidth = 150
 let paddleX = (canvas.width - paddleWidth) / 2 //position the paddle in the center
-let paddleY = (paddleHeight - 10) //10px above the bottom of the canvas
+let paddleY = (canvas.height - paddleHeight- 10) //10px above the bottom of the canvas
 
 //fuction to draw the game paddle
 function drawPaddle() {
@@ -36,14 +36,25 @@ function drawPaddle() {
 
 
 //create the brick properties coordinates
-let bricks = []; //store bricks in array
 let brickWidth = 50
-let brickHeight = 10
+let brickHeight = 15
 let brickRowsCount = 5
-let brickColumnCount = 8
+let brickColumnCount = 9
 let brickPadding = 10
-let brickOffSetTop = 30
-let brickOffSetLeft = 30
+let brickOffSetTop = 40
+let brickOffSetLeft = 35
+
+
+let bricks = []; //store bricks in array
+//initialize the bricks array
+for (let c = 0; c < brickColumnCount; c++){
+    bricks[c] = []
+    for (let r = 0; r < brickRowsCount; r++){
+        bricks[c][r] = {x: 0, y : 0, status: 1} // 1 means visible not hit
+    }
+}
+
+
 
 //function to draw the bricks in the game 
 function drawBricks() {
@@ -78,7 +89,7 @@ let leftPressed = false;
 let isPaused = false;
 
 document.addEventListener("keydown", keyDownHandler, false)
-document.addEventListener("keykup", keyUpHandler, false)
+document.addEventListener("keyup", keyUpHandler, false)
 
 //functions to handle the game controls (keyboard)
 //when the keys are pressed by the user
@@ -117,5 +128,67 @@ function keyUpHandler(e) {
     }
 }
 
+//function to handle if the ball hit any brick 
+//remove the brick and ball bounce off
+function handleCollision(){
+    for (let c = 0; c < brickColumnCount; c++)
+        for (let r = 0; r < brickRowsCount; r++) {
+            let b = bricks[c][r]//get current bricks
+            
+            //check if brick is visible(status = 1)
+            if (b.status === 1) {
+                //check if the ball position overlap with the brick postion
+                if (
+                    x > b.x && x < b.x + brickWidth && //Ball is within the brick's horizontal range
+                    y > b.y && y < b.y + brickHeight  // Ball is within the brick's vertical range
+                ){
+                    dy = -dy// Reverse the ball's vertical direction (bounce off)
+                    b.status = 0; // Set brick's status to 0 (remove it)
+                }
+            }
+        }
+}
 
+//function to update the game
+function update(){
+    if (rightPressed && paddleX < canvas.width - paddleWidth){
+        paddleX += 7
+    }else if (leftPressed && paddleX >0 ){
+        paddleX = 7;
+    }
+    x += dx;
+    y += dy;
+
+    //handle collision with walls
+    if (x + ballRadius > canvas.width || x - ballRadius < 0) {
+        dx = -dx;
+    } 
+    if (y-ballRadius < 0) {
+        dy = -dy;
+    }
+
+    //ball collision rith paddle and bounce
+    if (
+        y + ballRadius > canvas.height - paddleHeight - 10 &&
+        x > paddleX &&
+        x < paddleX + paddleWidth
+    ){
+        dy = -dy; // bounce off
+    }
+
+    //ball out of bound
+    if (y + ballRadius > canvas.height) {
+        alert("Game Over")
+        document.location.reload();
+    }
+    handleCollision()
+}
+
+
+ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+   drawBricks();
+    drawBall();
+    drawPaddle();
+    requestAnimationFrame(draw); // Keep animating
+    
 
