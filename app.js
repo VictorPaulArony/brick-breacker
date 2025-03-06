@@ -117,9 +117,6 @@ function keyUpHandler(e) {
     }
 }
 
-
-<<<<<<< Updated upstream
-=======
 //function to update the game
 function update(){
     if (rightPressed && paddleX < canvas.width - paddleWidth){
@@ -171,5 +168,5 @@ function draw() {
 }
  draw();
 
->>>>>>> Stashed changes
+
 
