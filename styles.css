@@ -1,0 +1,18 @@
+:root {
+    --background:#70ecf51e;
+    --primary-color:#ffff;
+    --secondary-color: #000000;
+}
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--background);
+}
+
+.game-interface {
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 0 20px #ffffff80;
+}
