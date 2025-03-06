@@ -128,27 +128,6 @@ function keyUpHandler(e) {
     }
 }
 
-//function to handle if the ball hit any brick 
-//remove the brick and ball bounce off
-function handleCollision(){
-    for (let c = 0; c < brickColumnCount; c++)
-        for (let r = 0; r < brickRowsCount; r++) {
-            let b = bricks[c][r]//get current bricks
-            
-            //check if brick is visible(status = 1)
-            if (b.status === 1) {
-                //check if the ball position overlap with the brick postion
-                if (
-                    x > b.x && x < b.x + brickWidth && //Ball is within the brick's horizontal range
-                    y > b.y && y < b.y + brickHeight  // Ball is within the brick's vertical range
-                ){
-                    dy = -dy// Reverse the ball's vertical direction (bounce off)
-                    b.status = 0; // Set brick's status to 0 (remove it)
-                }
-            }
-        }
-}
-
 //function to update the game
 function update(){
     if (rightPressed && paddleX < canvas.width - paddleWidth){
@@ -184,11 +163,41 @@ function update(){
     handleCollision()
 }
 
+//function to handle if the ball hit any brick 
+//remove the brick and ball bounce off
+function handleCollision(){
+    for (let c = 0; c < brickColumnCount; c++)
+        for (let r = 0; r < brickRowsCount; r++) {
+            let b = bricks[c][r]//get current bricks
+            
+            //check if brick is visible(status = 1)
+            if (b.status === 1) {
+                //check if the ball position overlap with the brick postion
+                if (
+                    x > b.x && x < b.x + brickWidth && //Ball is within the brick's horizontal range
+                    y > b.y && y < b.y + brickHeight  // Ball is within the brick's vertical range
+                ){
+                    dy = -dy// Reverse the ball's vertical direction (bounce off)
+                    b.status = 0; // Set brick's status to 0 (remove it)
+                }
+            }
+        }
+}
 
-ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-   drawBricks();
+
+function draw() {
+    if (isPaused) {
+        return; // Stop drawing if the game is paused
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+    drawBricks();
     drawBall();
     drawPaddle();
-    requestAnimationFrame(draw); // Keep animating
+    update();
+
+    requestAnimationFrame(draw); // Keep animating unless paused
+}
+ draw();
     
 
