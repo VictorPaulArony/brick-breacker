@@ -1,0 +1,5 @@
+:root {
+    --background:#70ecf51e;
+    --primary-color:#ffff;
+    --secondary-color: #000000;
+}
