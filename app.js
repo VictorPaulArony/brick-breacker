@@ -17,3 +17,19 @@ function drawBall() {
     ctx.fill() //inisiate the fill with the above color
     ctx.closePath()//end current path
 }
+
+//define the paddle properties(where the ball will be bouncing at during play)
+let paddleHeight = 10
+let paddleWidth = 100
+let paddleX = (canvas.width - paddleWidth) / 2 //position the paddle in the center
+let paddleY = (paddleHeight - 10) //10px above the bottom of the canvas
+
+//fuction to draw the game paddle
+function drawPaddle() {
+    ctx.beginPath()
+    ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight)
+    ctx.fillStyle = "#09f" // color blue
+    ctx.fill() // fill the paddle with the abpve color
+    ctx.closePath() // Close the drawing path for performance optimization
+
+}
