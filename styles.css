@@ -1,10 +1,19 @@
-:root {
-    --background:#70ecf51e;
-    --primary-color:#ffff;
-    --secondary-color: #000000;
+:root{
+    --gameArea:#000000;
+    --brick: #ffa500;
+    --paddle: #0000ff;
+    --ball : #ff0000;
+    --background: #222;
+    --primary: #ffffff;
 }
-body {
+
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,6 +22,33 @@ body {
 }
 
 .game-interface {
-    border: 2px solid var(--secondary-color);
-    box-shadow: 0 0 20px #ffffff80;
+    position: relative;
+    width: 600px;
+    height: 500px;
+    background:var(--gameArea);
+    border: 2px solid var(--primary);
+    overflow: hidden;
+}
+
+#ball {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: var(--ball);
+    border-radius: 50%;
+}
+
+#paddle {
+    position: absolute;
+    width: 100px;
+    height: 10px;
+    background-color: var(--paddle);
+    bottom: 10px;
+}
+
+.brick {
+    position: absolute;
+    width: 50px;
+    height: 10px;
+    background-color: var(--brick);
 }
