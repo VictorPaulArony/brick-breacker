@@ -1,10 +1,10 @@
 :root{
-    --gameArea:#000000;
-    --brick: #ffa500;
-    --paddle: #0000ff;
-    --ball : #ff0000;
+    --gameArea:#04588C;
+    --brick: #BF3B3B;
+    --paddle: #F28705;
+    --ball : #F2B807;
     --background: #222;
-    --primary: #ffffff;
+    --primary: #;
 }
 
 * {
@@ -48,7 +48,8 @@ body {
 
 .brick {
     position: absolute;
-    width: 50px;
-    height: 10px;
+    width: 60px;
+    height: 20px;
     background-color: var(--brick);
+    padding:1px 5px;
 }
