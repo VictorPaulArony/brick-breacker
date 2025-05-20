@@ -3,6 +3,8 @@ const gameArea = document.getElementById("game-interface");
 const bricksContainer = document.getElementById("bricks");
 const ball = document.getElementById("ball");
 const paddle = document.getElementById("paddle");
+const scoreBoard = document.getElementById("score");
+const messageBox = document.getElementById("game-message");
 
 // Game dimensions
 const gameWidth = 600;
@@ -36,6 +38,11 @@ let rightPressed = false;
 let leftPressed = false;
 let isPaused = false;
 
+// Gameplay
+let score = 0;
+let animationId;
+let hasBounced = false;
+
 // Create bricks
 function drawBricks() {
     bricksContainer.innerHTML = ""; // Clear existing bricks
@@ -57,69 +64,161 @@ function drawBricks() {
 // Paddle movement
 function movePaddle() {
     if (rightPressed && paddleX < gameWidth - paddleWidth) {
-        paddleX += 10;
+        paddleX += 8;
     } else if (leftPressed && paddleX > 0) {
-        paddleX -= 10;
+        paddleX -= 8;
     }
     paddle.style.left = paddleX + "px";
 }
 
-// Ball movement and collision
+// Ball movement
 function moveBall() {
     if (isPaused) return;
+
+    console.log("--- Frame Start ---");
+    console.log(`Ball (before update): x=${x.toFixed(2)}, y=${y.toFixed(2)}, dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
+    console.log(`Paddle: paddleX=${paddleX.toFixed(2)}, paddleY=${paddleY.toFixed(2)}`);
+
 
     x += dx;
     y += dy;
 
-    // Wall collisions
-    if (x <= 0 || x + ballSize >= gameWidth) dx = -dx;
-    if (y <= 0) dy = -dy;
+    console.log(`Ball (after update): x=${x.toFixed(2)}, y=${y.toFixed(2)}, dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
 
-    // Paddle collision
-    if (
-        y + ballSize >= paddleY &&
-        x + ballSize > paddleX &&
-        x < paddleX + paddleWidth
-    ) {
-        dy = -dy;
+
+    checkWallCollision();
+
+    // Check for paddle collision. This function now handles game over directly if missed.
+    const didBounceOffPaddle = checkPaddleCollision();
+
+    console.log(`Did paddle bounce? ${didBounceOffPaddle}`);
+
+     // If checkPaddleCollision called gameOver(), we need to stop the animation.
+    // The gameOver function will cancel animationId, so we just need to return.
+    // We can check if the game message is visible to see if game over occurred.
+    if (messageBox.style.display === "block" && messageBox.innerText === "GAME OVER") {
+        return; 
     }
 
-    // Brick collision
-    for (let c = 0; c < brickColumnCount; c++) {
-        for (let r = 0; r < brickRowsCount; r++) {
-            let b = bricks[c][r];
-            if (b.status === 1) {
-                let brickLeft = b.element.offsetLeft;
-                let brickTop = b.element.offsetTop;
-                let brickRight = brickLeft + brickWidth;
-                let brickBottom = brickTop + brickHeight;
+    checkBrickCollision();
 
-                if (
-                    x + ballSize > brickLeft &&
-                    x < brickRight &&
-                    y + ballSize > brickTop &&
-                    y < brickBottom
-                ) {
-                    dy = -dy;
-                    b.status = 0;
-                    b.element.style.display = "none";
-                }
-            }
-        }
-    }
-
-    // Game over check
+    // GameOver check
     if (y + ballSize >= gameHeight) {
-        alert("Game Over!");
-        document.location.reload();
+        gameOver();
+        return;
     }
 
-    // Update ball position
+    // Updating the ball position
     ball.style.left = x + "px";
     ball.style.top = y + "px";
 
     movePaddle();
-    requestAnimationFrame(moveBall);
+    animationId = requestAnimationFrame(moveBall);
+
+    console.log("--- Frame End ---");
+}
+
+function checkWallCollision() {
+    if (x <= 0 || x + ballSize >= gameWidth) dx = -dx;
+    if (y <= 0) dy = -dy;
+}
+
+function checkPaddleCollision() {
+    const ballTop = y;
+    const ballBottom = y + ballSize;
+    const ballLeft = x;
+    const ballRight = x + ballSize;
+    const ballCenterX = x + ballSize / 2;
+
+    const paddleTop = paddleY;
+    const paddleBottom = paddleY + paddleHeight;
+    const paddleLeft = paddleX;
+    const paddleRight = paddleX + paddleWidth;
+
+    // First, check if the ball is even in the horizontal range of the paddle
+    const isHorizontallyAligned = (ballRight > paddleLeft && ballLeft < paddleRight);
+
+    console.log(`Paddle check: ballBottom=${ballBottom.toFixed(2)}, paddleTop=${paddleTop.toFixed(2)}, dy=${dy.toFixed(2)}, isHorizontallyAligned=${isHorizontallyAligned}`);
+    console.log(`Collision condition: ${dy > 0 && isHorizontallyAligned && ballBottom >= paddleTop && ballTop < paddleBottom}`);
+
+    // If the ball is moving downwards (dy > 0)
+    // AND it's horizontally aligned with the paddle
+    // AND its bottom edge has crossed or is about to cross the paddle's top edge
+    // AND its top edge is still above the paddle's bottom edge (to prevent hitting from below)
+    if (dy > 0 && isHorizontallyAligned && ballBottom >= paddleTop && ballTop < paddleBottom) {
+        // Collision detected!
+        console.log("PADDLE HIT DEECTED!")
+
+        // 1. Reposition the ball exactly on top of the paddle
+        y = paddleY - ballSize;
+
+        // 2. Reverse vertical direction
+        // dy = -dy; // We'll set dy dynamically for angle
+
+        // 3. Calculate bounce angle and new dx, dy
+        const hitPoint = (ballCenterX - paddleLeft) / paddleWidth; // 0 (left) to 1 (right)
+        const normalizedHitPoint = (hitPoint * 2) - 1; // -1 (left) to 1 (right)
+
+        // Adjust this angle factor for desired bounce spread. Math.PI/3 is good for 60-degree max spread.
+        const bounceAngle = normalizedHitPoint * (Math.PI / 3); 
+
+        // Set a consistent speed after paddle hit. You can adjust this.
+        const ballSpeed = Math.sqrt(dx * dx + dy * dy); // Maintain current speed, or set a fixed speed like 5
+
+        dx = ballSpeed * Math.sin(bounceAngle);
+        dy = -ballSpeed * Math.cos(bounceAngle); // Ensure it always goes upwards
+        console.log(`New dy after bounce: ${dy.toFixed(2)}`);
+        return true; // Indicate that a bounce happened
+    }
+
+     // If the ball's top edge has passed the paddle's bottom edge (meaning it missed the paddle)
+    // AND it's still moving downwards (dy > 0)
+    // This is the "game over" condition specific to missing the paddle.
+    if (dy > 0 && ballTop >= paddleBottom && isHorizontallyAligned) { // Check horizontal alignment for clearer miss
+        console.log("GAME OVER: Ball passed paddle!");
+        gameOver();
+        return false; // Ball missed the paddle
+   }
+   
+   // Fallback game over if it just goes too low, regardless of paddle horizontal alignment
+   if (ballTop > gameHeight) { // Or ballBottom > gameHeight
+    console.log("GAME OVER: Ball fell below game height!");   
+    gameOver();
+       return false;
+   }
+
+   return false; // No collision or game over yet
+}
+
+
+function checkBrickCollision() {
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowsCount; r++) {
+            let b = bricks[c][r];
+            if (b.status === 1) {
+                let rect = b.element.getBoundingClientRect();
+                let ballRect = ball.getBoundingClientRect();
+                if (
+                    ballRect.right > rect.left &&
+                    ballRect.left < rect.right &&
+                    ballRect.bottom > rect.top &&
+                    ballRect.top < rect.bottom
+                ) {
+                    dy = -dy;
+                    b.status = 0;
+                    b.element.style.display = "none";
+                    score += 10;
+                    scoreBoard.innerText = `Score: ${score}`;
+                }
+            }
+        }
+    }
+}
+
+function gameOver() {
+    cancelAnimationFrame(animationId);
+    messageBox.innerText = "GAME OVER";
+    messageBox.style.display = "block";
 }
 
 // Handle keyboard controls
@@ -129,18 +228,44 @@ document.addEventListener("keyup", keyUpHandler);
 function keyDownHandler(e) {
     if (e.key === "ArrowRight") rightPressed = true;
     else if (e.key === "ArrowLeft") leftPressed = true;
-    else if (e.key === "p" || e.key === "P") isPaused = true;
-    else if (e.key === "c" || e.key === "C") {
-        isPaused = false;
-        moveBall();
-    } else if (e.key === "r" || e.key === "R") {
-        document.location.reload();
+    else if (e.code === "Space") {
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            cancelAnimationFrame(animationId);
+            document.getElementById("pause-menu").style.display = "flex";
+        } else {
+            document.getElementById("pause-menu").style.display = "none";
+            animationId = requestAnimationFrame(moveBall);
+        }
     }
 }
 
 function keyUpHandler(e) {
     if (e.key === "ArrowRight") rightPressed = false;
     else if (e.key === "ArrowLeft") leftPressed = false;
+}
+
+// Pause Menu Handlers
+function showPauseMenu() {
+    isPaused = true;
+    cancelAnimationFrame(animationId);
+    document.getElementById("pause-menu").style.display = "flex";
+}
+
+function resumeGame() {
+    isPaused = false;
+    document.getElementById("pause-menu").style.display = "none";
+    animationId = requestAnimationFrame(moveBall);
+}
+
+function restartGame() {
+    document.location.reload();
+}
+
+function quitGame() {
+    isPaused = true;
+    document.getElementById("pause-menu").innerHTML = "<p>Thanks for playing!</p>";
 }
 
 // Start the game
