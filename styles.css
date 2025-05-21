@@ -21,6 +21,11 @@ body {
     background-color: var(--background);
 }
 
+#ball, #paddle, .brick {
+    backface-visibility: hidden;
+    will-change: transform; /* Indicates to the browser that these elements will move */
+}
+
 .game-interface {
     position: relative;
     width: 600px;
@@ -28,6 +33,7 @@ body {
     background:var(--gameArea);
     border: 2px solid var(--primary);
     overflow: hidden;
+    /* contain: strict;  */
 }
 
 #ball {
@@ -51,4 +57,38 @@ body {
     width: 50px;
     height: 10px;
     background-color: var(--brick);
+    
+}
+#game-container {
+    position: relative;
+    width: 600px;
+    margin: 0 auto;
+}
+
+#scoreboard {
+    display: flex;
+    justify-content: space-between;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+    font-family: Arial, sans-serif;
+    margin-bottom: 5px;
+}
+
+#timer, #score, #lives {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#timer {
+    color: #ff9900;
+}
+
+#score {
+    color: #33cc33;
+}
+
+#lives {
+    color: #ff3333;
 }
