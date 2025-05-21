@@ -21,7 +21,7 @@ let dy = -4;
 let paddleWidth = 100;
 let paddleHeight = 10;
 let paddleX = (gameWidth - paddleWidth) / 2;
-let paddleY = gameHeight - paddleHeight - 10;
+let paddleY = gameHeight - paddleHeight - 30;
 
 // Bricks properties
 let bricks = [];
@@ -89,11 +89,9 @@ function moveBall() {
     checkWallCollision();
 
     // Check for paddle collision. This function now handles game over directly if missed.
-    const didBounceOffPaddle = checkPaddleCollision();
+    checkPaddleCollision();
 
-    console.log(`Did paddle bounce? ${didBounceOffPaddle}`);
-
-     // If checkPaddleCollision called gameOver(), we need to stop the animation.
+    // If checkPaddleCollision called gameOver(), we need to stop the animation.
     // The gameOver function will cancel animationId, so we just need to return.
     // We can check if the game message is visible to see if game over occurred.
     if (messageBox.style.display === "block" && messageBox.innerText === "GAME OVER") {
@@ -138,9 +136,6 @@ function checkPaddleCollision() {
     // First, check if the ball is even in the horizontal range of the paddle
     const isHorizontallyAligned = (ballRight > paddleLeft && ballLeft < paddleRight);
 
-    console.log(`Paddle check: ballBottom=${ballBottom.toFixed(2)}, paddleTop=${paddleTop.toFixed(2)}, dy=${dy.toFixed(2)}, isHorizontallyAligned=${isHorizontallyAligned}`);
-    console.log(`Collision condition: ${dy > 0 && isHorizontallyAligned && ballBottom >= paddleTop && ballTop < paddleBottom}`);
-
     // If the ball is moving downwards (dy > 0)
     // AND it's horizontally aligned with the paddle
     // AND its bottom edge has crossed or is about to cross the paddle's top edge
@@ -174,7 +169,7 @@ function checkPaddleCollision() {
      // If the ball's top edge has passed the paddle's bottom edge (meaning it missed the paddle)
     // AND it's still moving downwards (dy > 0)
     // This is the "game over" condition specific to missing the paddle.
-    if (dy > 0 && ballTop >= paddleBottom && isHorizontallyAligned) { // Check horizontal alignment for clearer miss
+    if (dy > 0 && isHorizontallyAligned && ballTop >= paddleBottom) { // Check horizontal alignment for clearer miss
         console.log("GAME OVER: Ball passed paddle!");
         gameOver();
         return false; // Ball missed the paddle
