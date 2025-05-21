@@ -55,7 +55,14 @@ function drawBricks() {
             brick.classList.add("brick");
             brick.style.left = brickX + "px";
             brick.style.top = brickY + "px";
-            bricks[c][r] = { element: brick, status: 1 };
+            bricks[c][r] = { 
+                element: brick, 
+                status: 1,
+                x: brickX,
+                y: brickY,
+                width: brickWidth,
+                height: brickHeight
+            };
             bricksContainer.appendChild(brick);
         }
     }
@@ -78,8 +85,7 @@ function moveBall() {
     x += dx;
     y += dy;
 
-    console.log(`Ball (after update): x=${x.toFixed(2)}, y=${y.toFixed(2)}, dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
-
+ 
     checkWallCollision();
 
     // Check for paddle collision. This function now handles game over directly if missed.
@@ -179,13 +185,12 @@ function checkBrickCollision() {
         for (let r = 0; r < brickRowsCount; r++) {
             let b = bricks[c][r];
             if (b.status === 1) {
-                let rect = b.element.getBoundingClientRect();
-                let ballRect = ball.getBoundingClientRect();
+                // Use stored numerical properties instead of getBoundingClientRect()
                 if (
-                    ballRect.right > rect.left &&
-                    ballRect.left < rect.right &&
-                    ballRect.bottom > rect.top &&
-                    ballRect.top < rect.bottom
+                    x + ballSize > b.x &&            // Ball's right edge past brick's left
+                    x < b.x + b.width &&             // Ball's left edge past brick's right
+                    y + ballSize > b.y &&            // Ball's bottom edge past brick's top
+                    y < b.y + b.height               // Ball's top edge past brick's bottom
                 ) {
                     dy = -dy;
                     b.status = 0;
@@ -197,6 +202,7 @@ function checkBrickCollision() {
         }
     }
 }
+
 
 function gameOver() {
     cancelAnimationFrame(animationId);
@@ -255,5 +261,6 @@ function quitGame() {
 function main() {
     drawBricks();
     moveBall();
+    
 }
 main();
