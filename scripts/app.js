@@ -75,16 +75,10 @@ function movePaddle() {
 function moveBall() {
     if (isPaused) return;
 
-    console.log("--- Frame Start ---");
-    console.log(`Ball (before update): x=${x.toFixed(2)}, y=${y.toFixed(2)}, dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
-    console.log(`Paddle: paddleX=${paddleX.toFixed(2)}, paddleY=${paddleY.toFixed(2)}`);
-
-
     x += dx;
     y += dy;
 
     console.log(`Ball (after update): x=${x.toFixed(2)}, y=${y.toFixed(2)}, dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
-
 
     checkWallCollision();
 
@@ -113,7 +107,6 @@ function moveBall() {
     movePaddle();
     animationId = requestAnimationFrame(moveBall);
 
-    console.log("--- Frame End ---");
 }
 
 function checkWallCollision() {
@@ -141,8 +134,6 @@ function checkPaddleCollision() {
     // AND its bottom edge has crossed or is about to cross the paddle's top edge
     // AND its top edge is still above the paddle's bottom edge (to prevent hitting from below)
     if (dy > 0 && isHorizontallyAligned && ballBottom >= paddleTop && ballTop < paddleBottom) {
-        // Collision detected!
-        console.log("PADDLE HIT DEECTED!")
 
         // 1. Reposition the ball exactly on top of the paddle
         y = paddleY - ballSize;
@@ -162,7 +153,6 @@ function checkPaddleCollision() {
 
         dx = ballSpeed * Math.sin(bounceAngle);
         dy = -ballSpeed * Math.cos(bounceAngle); // Ensure it always goes upwards
-        console.log(`New dy after bounce: ${dy.toFixed(2)}`);
         return true; // Indicate that a bounce happened
     }
 
@@ -170,14 +160,12 @@ function checkPaddleCollision() {
     // AND it's still moving downwards (dy > 0)
     // This is the "game over" condition specific to missing the paddle.
     if (dy > 0 && isHorizontallyAligned && ballTop >= paddleBottom) { // Check horizontal alignment for clearer miss
-        console.log("GAME OVER: Ball passed paddle!");
         gameOver();
         return false; // Ball missed the paddle
    }
    
    // Fallback game over if it just goes too low, regardless of paddle horizontal alignment
-   if (ballTop > gameHeight) { // Or ballBottom > gameHeight
-    console.log("GAME OVER: Ball fell below game height!");   
+   if (ballTop > gameHeight) { // Or ballBottom > gameHeight  
     gameOver();
        return false;
    }
