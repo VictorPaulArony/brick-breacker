@@ -2,17 +2,73 @@
     --background:#70ecf51e;
     --primary-color:#ffff;
     --secondary-color: #000000;
+    --paddle:#0000ff;
+    --ball: rgb(3, 3, 3);
+    --brick: #ff0000;
 }
 body {
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-color: var(--background);
 }
 
 .game-interface {
     border: 2px solid var(--secondary-color);
-    box-shadow: 0 0 20px #ffffff80;
+    position: relative;
+    background: var(--background);
+    margin-top: 50px;
+    width: 600px;
+    height: 500px;
+}
+#ball, #paddle, .brick {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+#game-interface {
+    contain: layout style paint;
+}
+
+#paddle{
+    width: 100px;
+    height: 10px;
+    background: var(--paddle);
+    position: absolute;
+    bottom: 10px;
+  
+}
+
+#ball{
+    width: 20px;
+    height: 20px;
+    background: var(--ball);
+    position: absolute;
+    bottom: 50px;
+    border-radius: 50%;
+  
+}
+.brick{
+    width: 50px;
+    height: 10px;
+    background: var(--brick);
+    position: absolute;
+}
+
+.message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--secondary-color);
+    text-align: center;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
 }
