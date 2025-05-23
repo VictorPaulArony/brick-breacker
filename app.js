@@ -16,7 +16,7 @@ const gameHeight = 500;
 // Ball properties
 let ballSize = 20;
 let x = gameWidth / 2 - ballSize / 2; // Center ball horizontally
-let y = gameHeight - 50; // Start above paddle
+let y = gameHeight - 45; // Start above paddle
 let dx = -4;
 let dy = -4;
 
@@ -30,10 +30,10 @@ let paddleY = gameHeight - paddleHeight - 10;
 let bricks = [];
 const brickWidth = 50;
 const brickHeight = 10;
-const brickRowsCount = 5;
+const brickRowsCount = 3;
 const brickColumnCount = 9;
 const brickPadding = 10;
-const brickOffsetTop = 50;
+const brickOffsetTop = 40;
 const brickOffsetLeft = 30;
 
 // Controls
@@ -46,6 +46,10 @@ let score = 0;
 let lives = 3;
 let gameTime = 60; // 60 seconds countdown
 let timerInterval;
+
+// Game state
+let isGameStarted = false;
+let animationId = null;
 
 // Create bricks
 function drawBricks() {
@@ -64,7 +68,7 @@ function drawBricks() {
         }
     }
 }
- 
+
 // Paddle movement
 function movePaddle() {
     if (rightPressed && paddleX < gameWidth - paddleWidth) {
@@ -72,7 +76,6 @@ function movePaddle() {
     } else if (leftPressed && paddleX > 0) {
         paddleX -= 7;
     }
-    // paddle.style.left = paddleX + "px";
     paddle.style.transform = `translateX(${paddleX}px)`;
 }
 
@@ -122,7 +125,7 @@ function endGame() {
 // Reset ball position
 function resetBall() {
     x = gameWidth / 2 - ballSize / 2;
-    y = gameHeight - 50;
+    y = gameHeight - 45;
     dx = -4;
     dy = -4;
     paddleX = (gameWidth - paddleWidth) / 2;
@@ -130,7 +133,7 @@ function resetBall() {
 
 // Ball movement and collision
 function moveBall() {
-    if (isPaused) return;
+    if (isPaused || !isGameStarted) return;
 
     x += dx;
     y += dy;
@@ -148,50 +151,50 @@ function moveBall() {
         dy = -dy;
     }
 
+    // Bottom collision (lose life)
+    if (y + ballSize > gameHeight) {
+        lives--;
+        livesValue.textContent = lives;
+        if (lives <= 0) {
+            alert("Game Over! Your final score is " + score);
+            endGame();
+            return;
+        }
+        resetBall();
+    }
+
     // Brick collision
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowsCount; r++) {
-            let b = bricks[c][r];
-            if (b.status === 1) {
-                let brickLeft = b.element.offsetLeft;
-                let brickTop = b.element.offsetTop;
-                let brickRight = brickLeft + brickWidth;
-                let brickBottom = brickTop + brickHeight;
+            let brick = bricks[c][r];
+            if (brick.status === 1) {
+                let brickElement = brick.element;
+                let brickRect = brickElement.getBoundingClientRect();
+                let gameRect = gameArea.getBoundingClientRect();
+                let brickX = brickRect.left - gameRect.left;
+                let brickY = brickRect.top - gameRect.top;
 
                 if (
-                    x + ballSize > brickLeft &&
-                    x < brickRight &&
-                    y + ballSize > brickTop &&
-                    y < brickBottom
+                    x + ballSize > brickX &&
+                    x < brickX + brickWidth &&
+                    y + ballSize > brickY &&
+                    y < brickY + brickHeight
                 ) {
                     dy = -dy;
-                    b.status = 0;
-                    b.element.style.display = "none";
+                    brick.status = 0;
+                    brickElement.style.visibility = "hidden";
                     updateScore();
-                    
                 }
             }
         }
     }
 
-    // Game over check - lost a life
-    if (y + ballSize >= gameHeight) {
-        lives--;
-        livesValue.textContent = lives;
-        
-        if (lives <= 0) {
-            alert("Game Over! Your final score is " + score);
-            endGame();
-        } else {
-            resetBall();
-        }
-    }
-
     // Update ball position
     ball.style.transform = `translate(${x}px, ${y}px)`;
-
     movePaddle();
-    requestAnimationFrame(moveBall );
+
+    // Request next frame
+    animationId = requestAnimationFrame(moveBall);
 }
 
 // Handle keyboard controls
@@ -199,26 +202,28 @@ document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 
 function keyDownHandler(e) {
-    if (e.key === "ArrowRight") rightPressed = true;
-    else if (e.key === "ArrowLeft") leftPressed = true;
-    else if (e.key === "p" || e.key === "P") {
-        isPaused = true;
-        clearInterval(timerInterval);
-    }
-    else if (e.key === "c" || e.key === "C") {
-        if (isPaused) {
-            isPaused = false;
-            startTimer();
-            moveBall();
-        }
-    } else if (e.key === "r" || e.key === "R") {
-        document.location.reload();
+    if (e.key === "Right" || e.key === "ArrowRight") {
+        rightPressed = true;
+    } else if (e.key === "Left" || e.key === "ArrowLeft") {
+        leftPressed = true;
+    } else if (e.code === "Space" && !isGameStarted) {
+        startGame();
     }
 }
 
 function keyUpHandler(e) {
-    if (e.key === "ArrowRight") rightPressed = false;
-    else if (e.key === "ArrowLeft") leftPressed = false;
+    if (e.key === "Right" || e.key === "ArrowRight") {
+        rightPressed = false;
+    } else if (e.key === "Left" || e.key === "ArrowLeft") {
+        leftPressed = false;
+    }
+}
+
+function startGame() {
+    isGameStarted = true;
+    document.getElementById("start-message").style.display = "none";
+    startTimer();
+    moveBall();
 }
 
 // Initialize scoreboard
@@ -228,13 +233,13 @@ function initScoreboard() {
     timeValue.textContent = gameTime;
 }
 
-// Start the game
+// Initialize game
 function main() {
-    initScoreboard();
     drawBricks();
-    startTimer();
-    moveBall();
-    // requestAnimationFrame(moveBall);
+    initScoreboard();
+    resetBall();
+    ball.style.transform = `translate(${x}px, ${y}px)`;
+    paddle.style.transform = `translateX(${paddleX}px)`;
 }
 
 main();
