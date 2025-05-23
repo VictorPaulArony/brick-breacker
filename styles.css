@@ -84,27 +84,34 @@ body {
 /* Ball styling */
 #ball {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 10px;
     height: 10px;
     background: var(--ball);
     border-radius: 50%;
     box-shadow: 0 0 8px #FFD700;
+    will-change: transform;
 }
 
 /* Paddle styling */
 #paddle {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100px;
-    height: 12px;
+    height: 10px;
     background: var(--paddle);
-    bottom: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px #F28705;
+    will-change: transform;
 }
 
 /* Brick styling */
 .brick {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 60px;
     height: 20px;
     background: var(--brick);
@@ -116,6 +123,7 @@ body {
     font-size: 10px;
     line-height: 20px;
     font-family: var(--ui-font);
+    will-change: transform;
 }
 
 /* Optional: Add game-over / win screen styles */
