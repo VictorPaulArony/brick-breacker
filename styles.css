@@ -38,8 +38,8 @@ body {
 
 #ball {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     background: var(--ball);
     border-radius: 50%;
 }
@@ -91,4 +91,17 @@ body {
 
 #lives {
     color: #ff3333;
+}
+
+#start-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 100;
 }
