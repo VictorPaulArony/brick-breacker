@@ -7,10 +7,10 @@ const messageDisplay = document.getElementById("message")
 
 //create the ball to be used first
 let ballSize = 10
-let x = 300 // position of the ball
-let y = 490;
-let dy = -5 //speed of the ball
-let dx = -5
+let x = 0 // position of the ball
+let y = 0;
+let dy = 0//speed of the ball
+let dx = 0
 
 
 const gameWidth = 600;
@@ -18,7 +18,7 @@ const gameHeight = 500;
 
 //define the paddle properties(where the ball will be bouncing at during play)
 let paddleHeight = 10
-let paddleWidth = 100
+let paddleWidth = 600
 let paddleX = (gameWidth - paddleWidth) / 2;//position the paddle in the center
 let paddleY = (gameHeight - paddleHeight - 10) //10px above the bottom of the canvas
 
@@ -28,10 +28,10 @@ let paddleY = (gameHeight - paddleHeight - 10) //10px above the bottom of the ca
 let bricks = []; //store bricks in array
 let brickWidth = 50
 let brickHeight = 10
-let brickRowsCount = 3
+let brickRowsCount = 0
 let brickColumnCount = 9
-let brickPadding = 10
-let brickOffSetTop = 50
+let brickPadding = 12
+let brickOffSetTop = 20
 let brickOffSetLeft = 30
 
 
@@ -70,9 +70,9 @@ function drawBricks() {
 //fuction to draw the game paddle
 function movePaddle() {
     if (rightPressed && paddleX < gameWidth - paddleWidth) {
-        paddleX += 12;
+        paddleX += 10;
     } else if (leftPressed && paddleX > 0) {
-        paddleX -= 12;
+        paddleX -= 10;
     }
     paddle.style.left = paddleX + "px";
 }
@@ -95,7 +95,7 @@ function keyDownHandler(e) {
             isPaused = false; // Continue the game
             hideMessage();
             // requestAnimationFrame(moveBall);
-            moveBall()
+            // moveBall()
         }
     } else if (e.key === "r" || e.key === "R") {// Restart game
         resetGame();
@@ -124,7 +124,7 @@ function keyUpHandler(e) {
 //function to update the game
 // Ball Movement and Collision
 function moveBall() {
-    if (isPaused || !isGameStarted || isGameOver) return; // Don't move if game not started, paused, or over
+    if (isPaused || !isGameStarted || isGameOver) return; 
 
     x += dx;
     y += dy;
@@ -173,21 +173,23 @@ function moveBall() {
     requestAnimationFrame(moveBall);
 
     // Game over check
-    if (y + ballSize >= gameHeight) {
-        gameOver();
+    if (y + 10 +  ballSize >= gameHeight) {
+        // gameOver();
+        // resetGame() 
     }
 
     // Update positions
     ball.style.left = x + "px";
     ball.style.top = y+ "px";
 
+    
 }
 function resetGame() {
     // Reset ball position
     x = 290;
-    y = 450;
+    y = 460;
     dx = -4;
-    dy = 4;
+    dy = -4;
     
     // Reset paddle position
     paddleX = (gameWidth - paddleWidth) / 2;
