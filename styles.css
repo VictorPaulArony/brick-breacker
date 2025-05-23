@@ -88,9 +88,9 @@ body {
     left: 0;
     width: 10px;
     height: 10px;
-    background: var(--ball);
+    background: #F2B807;
     border-radius: 50%;
-    box-shadow: 0 0 8px #FFD700;
+    /* box-shadow: 0 0 8px #FFD700; */
     will-change: transform;
 }
 
@@ -101,9 +101,9 @@ body {
     left: 0;
     width: 100px;
     height: 10px;
-    background: var(--paddle);
-    border-radius: 5px;
-    box-shadow: 0 0 10px #F28705;
+    background: #F28705;
+    /* border-radius: 5px;
+    box-shadow: 0 0 10px #F28705; */
     will-change: transform;
 }
 
@@ -114,15 +114,11 @@ body {
     left: 0;
     width: 60px;
     height: 20px;
-    background: var(--brick);
-    border: 2px solid #8B1E1E;
-    border-radius: 4px;
-    box-shadow: 0 0 5px #BF3B3B;
+    background: #BF3B3B;
+    border: 1px solid #8B1E1E;
+  
     text-align: center;
-    color: #fff;
-    font-size: 10px;
-    line-height: 20px;
-    font-family: var(--ui-font);
+   
     will-change: transform;
 }
 
