@@ -53,8 +53,7 @@ function drawBricks() {
             let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
             let brick = document.createElement("div");
             brick.classList.add("brick");
-            brick.style.left = brickX + "px";
-            brick.style.top = brickY + "px";
+            brick.style.transform = `translate(${brickX}px, ${brickY}px)`;
             bricks[c][r] = { 
                 element: brick, 
                 status: 1,
@@ -75,13 +74,15 @@ function movePaddle() {
     } else if (leftPressed && paddleX > 0) {
         paddleX -= 8;
     }
-    paddle.style.left = paddleX + "px";
+    paddle.style.transform = `translate(${paddleX}px, ${paddleY}px)`;
 }
 
 // Ball movement
 function moveBall() {
-    if (isPaused) return;
-
+    if (isPaused) {
+        animationId = requestAnimationFrame(moveBall); // Keep loop alive even if paused
+        return;
+    }
     x += dx;
     y += dy;
 
@@ -106,9 +107,8 @@ function moveBall() {
         return;
     }
 
-    // Updating the ball position
-    ball.style.left = x + "px";
-    ball.style.top = y + "px";
+    // Updating the ball position using transform
+    ball.style.transform = `translate(${x}px, ${y}px)`;
 
     movePaddle();
     animationId = requestAnimationFrame(moveBall);
@@ -185,18 +185,64 @@ function checkBrickCollision() {
         for (let r = 0; r < brickRowsCount; r++) {
             let b = bricks[c][r];
             if (b.status === 1) {
-                // Use stored numerical properties instead of getBoundingClientRect()
-                if (
-                    x + ballSize > b.x &&            // Ball's right edge past brick's left
-                    x < b.x + b.width &&             // Ball's left edge past brick's right
-                    y + ballSize > b.y &&            // Ball's bottom edge past brick's top
-                    y < b.y + b.height               // Ball's top edge past brick's bottom
-                ) {
-                    dy = -dy;
+                const ballLeft = x;
+                const ballRight = x + ballSize;
+                const ballTop = y;
+                const ballBottom = y + ballSize;
+
+                const brickLeft = b.x;
+                const brickRight = b.x + b.width;
+                const brickTop = b.y;
+                const brickBottom = b.y + b.height;
+
+                const isOverlapping = (
+                    ballRight > brickLeft &&
+                    ballLeft < brickRight &&
+                    ballBottom > brickTop &&
+                    ballTop < brickBottom
+                );
+
+                if (isOverlapping) {
                     b.status = 0;
                     b.element.style.display = "none";
                     score += 10;
                     scoreBoard.innerText = `Score: ${score}`;
+
+                    let collisionOccurred = false;
+
+                    const prevX = x - dx;
+                    const prevY = y - dy;
+                    const prevBallLeft = prevX;
+                    const prevBallRight = prevX + ballSize;
+                    const prevBallTop = prevY;
+                    const prevBallBottom = prevY + ballSize;
+
+                    if (prevBallBottom <= brickTop && ballBottom > brickTop) {
+                        dy = -dy;
+                        y = brickTop - ballSize;
+                        collisionOccurred = true;
+                    } else if (prevBallTop >= brickBottom && ballTop < brickBottom) {
+                        dy = -dy;
+                        y = brickBottom;
+                        collisionOccurred = true;
+                    }
+
+                    if (!collisionOccurred) {
+                        if (prevBallRight <= brickLeft && ballRight > brickLeft) {
+                            dx = -dx;
+                            x = brickLeft - ballSize;
+                        } else if (prevBallLeft >= brickRight && ballLeft < brickRight) {
+                            dx = -dx;
+                            x = brickRight;
+                        } else {
+                            dy = -dy; // Fallback
+                        }
+                    }
+
+                    if (score === brickColumnCount * brickRowsCount * 10) {
+                        gameOver("YOU WIN!");
+                        return;
+                    }
                 }
             }
         }
@@ -204,9 +250,9 @@ function checkBrickCollision() {
 }
 
 
-function gameOver() {
+function gameOver(message = "GAME OVER") {
     cancelAnimationFrame(animationId);
-    messageBox.innerText = "GAME OVER";
+    messageBox.innerText = message;
     messageBox.style.display = "block";
 }
 
