@@ -285,12 +285,6 @@ function keyUpHandler(e) {
     else if (e.key === "ArrowLeft") leftPressed = false;
 }
 
-// // Pause Menu Handlers
-// function showPauseMenu() {
-//     isPaused = true;
-//     cancelAnimationFrame(animationId);
-//     document.getElementById("pause-menu").style.display = "flex";
-// }
 
 function resumeGame() {
     isPaused = false;
