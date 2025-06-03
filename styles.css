@@ -1,11 +1,7 @@
 :root {
     --gameArea: #04588C;
-    --brick: linear-gradient(to bottom, #BF3B3B, #8B1E1E);
-    --paddle: linear-gradient(to top, #F28705, #C46B00);
-    --ball: radial-gradient(circle, #F2B807, #DFA900);
     --background: #111;
     --primary: #00FFCC;
-    --glow: 0 0 10px #00FFCC, 0 0 20px #00FFCC;
     --ui-font: 'Press Start 2P', cursive;
 }
 
@@ -34,7 +30,7 @@ body {
     height: 500px;
     background: var(--gameArea);
     border: 4px solid var(--primary);
-    box-shadow: 0 0 20px #00FFCC;
+    box-shadow: none;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -49,7 +45,7 @@ body {
     left: 10px;
     font-size: 12px;
     color: var(--primary);
-    text-shadow: var(--glow);
+    text-shadow: none;
 }
 
 #game-message {
@@ -90,7 +86,6 @@ body {
     height: 10px;
     background: #F2B807;
     border-radius: 50%;
-    /* box-shadow: 0 0 8px #FFD700; */
     will-change: transform;
 }
 
@@ -102,8 +97,6 @@ body {
     width: 100px;
     height: 10px;
     background: #F28705;
-    /* border-radius: 5px;
-    box-shadow: 0 0 10px #F28705; */
     will-change: transform;
 }
 
@@ -112,13 +105,11 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 60px;
-    height: 20px;
+    width: 50px;
+    height: 10px;
     background: #BF3B3B;
-    border: 1px solid #8B1E1E;
-  
+    border: none;
     text-align: center;
-   
     will-change: transform;
 }
 
@@ -130,6 +121,5 @@ body {
     top: 40%;
     font-size: 18px;
     color: var(--primary);
-    text-shadow: var(--glow);
     display: none;
 }
