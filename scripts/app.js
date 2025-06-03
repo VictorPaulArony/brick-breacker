@@ -88,17 +88,7 @@ function moveBall() {
 
  
     checkWallCollision();
-
-    // Check for paddle collision. This function now handles game over directly if missed.
     checkPaddleCollision();
-
-    // If checkPaddleCollision called gameOver(), we need to stop the animation.
-    // The gameOver function will cancel animationId, so we just need to return.
-    // We can check if the game message is visible to see if game over occurred.
-    if (messageBox.style.display === "block" && messageBox.innerText === "GAME OVER") {
-        return; 
-    }
-
     checkBrickCollision();
 
     // GameOver check
@@ -240,7 +230,19 @@ function checkBrickCollision() {
                         }
                     }
 
-                    if (score === brickColumnCount * brickRowsCount * 10) {
+                    // Check for win condition (all bricks broken)
+                    let allBricksBroken = true;
+                    for (let c = 0; c < brickColumnCount; c++) {
+                        for (let r = 0; r < brickRowsCount; r++) {
+                            if (bricks[c][r].status === 1) {
+                                allBricksBroken = false;
+                                break;
+                            }
+                        }
+                        if (!allBricksBroken) break;
+                    }
+
+                    if (allBricksBroken) {
                         gameOver("YOU WIN!");
                         return;
                     }
@@ -253,8 +255,10 @@ function checkBrickCollision() {
 
 function gameOver(message = "GAME OVER") {
     cancelAnimationFrame(animationId);
-    messageBox.innerText = message;
-    messageBox.style.display = "block";
+    isPaused = true; // Ensure game state is paused
+    messageBox.innerText = message; // Set the message text
+    messageBox.style.display = "block"; // Show the message box
+    document.getElementById("pause-menu").style.display = "none"; // Ensure pause menu is hidden
 }
 
 // Handle keyboard controls
@@ -265,14 +269,13 @@ function keyDownHandler(e) {
     if (e.key === "ArrowRight") rightPressed = true;
     else if (e.key === "ArrowLeft") leftPressed = true;
     else if (e.code === "Space") {
-        isPaused = !isPaused;
-
-        if (isPaused) {
-            cancelAnimationFrame(animationId);
-            document.getElementById("pause-menu").style.display = "flex";
-        } else {
-            document.getElementById("pause-menu").style.display = "none";
-            animationId = requestAnimationFrame(moveBall);
+        // When spacebar is pressed, always pause and show the menu
+        if (!isPaused) { // Only pause if not already paused
+            isPaused = true;
+            cancelAnimationFrame(animationId); // Stop the game loop
+            document.getElementById("pause-menu").style.display = "flex"; // Show the pause menu
+            messageBox.style.display = "block"; // Ensure the game message overlay is visible
+            messageBox.innerText = ""; // Clear any previous game over/win message
         }
     }
 }
@@ -282,16 +285,17 @@ function keyUpHandler(e) {
     else if (e.key === "ArrowLeft") leftPressed = false;
 }
 
-// Pause Menu Handlers
-function showPauseMenu() {
-    isPaused = true;
-    cancelAnimationFrame(animationId);
-    document.getElementById("pause-menu").style.display = "flex";
-}
+// // Pause Menu Handlers
+// function showPauseMenu() {
+//     isPaused = true;
+//     cancelAnimationFrame(animationId);
+//     document.getElementById("pause-menu").style.display = "flex";
+// }
 
 function resumeGame() {
     isPaused = false;
     document.getElementById("pause-menu").style.display = "none";
+    messageBox.style.display = "none"; // Hide the entire message overlay
     animationId = requestAnimationFrame(moveBall);
 }
 
@@ -302,6 +306,8 @@ function restartGame() {
 function quitGame() {
     isPaused = true;
     document.getElementById("pause-menu").innerHTML = "<p>Thanks for playing!</p>";
+    messageBox.style.display = "block"; // Ensure message box is visible
+    document.getElementById("pause-menu").style.display = "none"; // Hide the pause menu
 }
 
 // Start the game
