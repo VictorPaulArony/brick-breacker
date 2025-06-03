@@ -205,6 +205,7 @@ function checkBrickCollision() {
                 if (isOverlapping) {
                     b.status = 0;
                     b.element.style.display = "none";
+                    b.element.style.willChange = 'auto';
                     score += 10;
                     scoreBoard.innerText = `Score: ${score}`;
 
