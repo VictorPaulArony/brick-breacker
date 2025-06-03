@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brick Breaker Game</title>
     <link rel="stylesheet" href="styles.css">
+    
     <script defer src="scripts/app.js"></script>
 </head>
 <body>
-    <div id="game-container" class="game-container"> <canvas id="gameCanvas" width="600" height="500"></canvas> <div id="score" class="ui-header">Score: 0</div> 
+    <div class="game-container">
+        <div id="game-interface" class="game-interface">
+            <div id="ball"></div>
+            <div id="paddle"></div>
+            <div id="bricks"></div>
+        </div>
+
+        <div id="score" class="ui-header">Score: 0</div>
+
         <div id="game-message" class="game-message">
             <div id="pause-menu" style="display: none;">
                 <p>Game Paused</p>
@@ -16,7 +25,7 @@
                 <button onclick="restartGame()">Restart</button>
                 <button onclick="quitGame()">Quit</button>
             </div>
-            <p id="game-over-text" style="display: none;"></p> 
+            
         </div>
     </div>
 </body>
