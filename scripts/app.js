@@ -1,4 +1,4 @@
-const { start } = require("repl");
+// const { start } = require("repl");
 
 // Selecting the game elements
 const gameArea = document.getElementById("game-interface");
