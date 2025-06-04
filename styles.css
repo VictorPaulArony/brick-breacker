@@ -146,3 +146,17 @@ body {
     color: var(--primary);
     display: none;
 }
+
+/* instruction to start game  */
+#start-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 100;
+}
