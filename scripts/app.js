@@ -1,3 +1,5 @@
+const { start } = require("repl");
+
 // Selecting the game elements
 const gameArea = document.getElementById("game-interface");
 const bricksContainer = document.getElementById("bricks");
@@ -43,6 +45,9 @@ let score = 0;
 let animationId;
 let hasBounced = false;
 
+// game state
+let isGameStarted = false
+
 // Create bricks
 function drawBricks() {
     bricksContainer.innerHTML = ""; // Clear existing bricks
@@ -79,7 +84,7 @@ function movePaddle() {
 
 // Ball movement
 function moveBall() {
-    if (isPaused) {
+    if (isPaused || !isGameStarted) {
         animationId = requestAnimationFrame(moveBall); // Keep loop alive even if paused
         return;
     }
@@ -243,7 +248,9 @@ function checkBrickCollision() {
                     }
 
                     if (allBricksBroken) {
-                        gameOver("YOU WIN!");
+                        alert("Game Over! Your final score is " + score);
+                        // gameOver("YOU WIN!");
+                        endGame();
                         return;
                     }
                 }
@@ -252,31 +259,40 @@ function checkBrickCollision() {
     }
 }
 
-
-function gameOver(message = "GAME OVER") {
-    cancelAnimationFrame(animationId);
-    isPaused = true; // Ensure game state is paused
-    messageBox.innerText = message; // Set the message text
-    messageBox.style.display = "block"; // Show the message box
-    // document.getElementById("pause-menu").style.display = "none"; // Ensure pause menu is hidden
+// End the game
+function endGame() {
+    clearInterval(timerInterval);
+    isPaused = true;
+    document.location.reload();
 }
+
+
+// function gameOver(message = "GAME OVER") {
+//     cancelAnimationFrame(animationId);
+//     isPaused = true; // Ensure game state is paused
+//     messageBox.innerText = message; // Set the message text
+//     messageBox.style.display = "block"; // Show the message box
+//     // document.getElementById("pause-menu").style.display = "none"; // Ensure pause menu is hidden
+// }
 
 // Handle keyboard controls
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 
 function keyDownHandler(e) {
-    if (e.key === "ArrowRight") rightPressed = true;
-    else if (e.key === "ArrowLeft") leftPressed = true;
-    else if (e.code === "Space") {
-        // When spacebar is pressed, always pause and show the menu
-        if (!isPaused) { // Only pause if not already paused
-            isPaused = true;
-            cancelAnimationFrame(animationId); // Stop the game loop
-            document.getElementById("pause-menu").style.display = "flex"; // Show the pause menu
-            messageBox.style.display = "block"; // Ensure the game message overlay is visible
-            messageBox.innerText = ""; // Clear any previous game over/win message
-        }
+     //move paddle right
+     if (e.key === "ArrowRight") {
+        rightPressed = true
+    } else if (e.key === "ArrowLeft") {
+        leftPressed = true
+    } else if (e.key === "p" || e.key === "P") {
+        isPaused = true;//pause the game 
+    } else if (e.key === "c" || e.key === "C") {
+        isPaused = false;// Continue the game 
+    } else if (e.key === "r" || e.key === "R") {// Restart game to start the game afresh
+        document.location.reload(); // Reload page to restart the game
+    }else if (e.key === "Space" && !isGameStarted) {
+        startGame();
     }
 }
 
@@ -284,25 +300,14 @@ function keyUpHandler(e) {
     if (e.key === "ArrowRight") rightPressed = false;
     else if (e.key === "ArrowLeft") leftPressed = false;
 }
-
-
-function resumeGame() {
-    isPaused = false;
-    document.getElementById("pause-menu").style.display = "none";
-    messageBox.style.display = "none"; // Hide the entire message overlay
-    animationId = requestAnimationFrame(moveBall);
+//function to start the game 
+function startGame() {
+    isGameStarted = true
+    document.getElementById("start-message").style.display = "none";
+    moveBall()
 }
 
-function restartGame() {
-    document.location.reload();
-}
 
-function quitGame() {
-    isPaused = true;
-    document.getElementById("pause-menu").innerHTML = "<p>Thanks for playing!</p>";
-    messageBox.style.display = "block"; // Ensure message box is visible
-    document.getElementById("pause-menu").style.display = "none"; // Hide the pause menu
-}
 
 // Start the game
 function main() {
