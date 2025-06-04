@@ -21,11 +21,10 @@ body {
     background-color: var(--background);
     font-family: var(--ui-font);
     color: var(--primary);
-    user-select: none;
 }
 
 /* New container for the game area and UI */
-.game-container {
+/* .game-container {
     position: relative; 
     width: 600px; 
     height: 500px; 
@@ -37,19 +36,40 @@ body {
     flex-direction: column;
     justify-content: flex-end;
     padding: 10px;
+} */
+
+#game-container {
+    position: relative;
+    width: 600px;
+    margin: 0 auto;
+}
+
+.game-interface {
+    position: relative;
+    width: 600px;
+    height: 500px;
+    background:var(--gameArea);
+    border: 2px solid var(--primary);
+    overflow: hidden;
+    /* contain: strict;  */
+}
+
+#ball, #paddle, .brick {
+    backface-visibility: hidden;
+    will-change: transform; /* Indicates to the browser that these elements will move */
 }
 
 /* Scoreboard / UI Header (optional) */
-.ui-header {
+/* .ui-header {
     position: absolute;
     top: 5px;
     left: 10px;
     font-size: 12px;
     color: var(--primary);
     text-shadow: none;
-}
+} */
 
-#game-message {
+/* #game-message {
     position: absolute;
     top: 0;
     left: 0;
@@ -62,82 +82,41 @@ body {
     align-items: center;
     flex-direction: column;
     z-index: 10; 
-}
+} */
 
 /* Styles for the pause menu content */
-#pause-menu {
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.7); /* Slightly darker background for the menu box */
-    padding: 50px; /* DEBUG: Large padding to make it very noticeable */
-    border-radius: 10px;
-    color: yellow; /* DEBUG: Bright yellow text */
-    box-shadow: 0 0 20px lime; /* DEBUG: Bright green glow */
-    /* The display property is controlled by JavaScript, set to flex */
-    display: flex; /* Ensure it's a flex container for its own content */
-    flex-direction: column; /* Stack buttons vertically */
-    justify-content: center;
-    align-items: center;
-}
 
-#pause-menu p {
-    font-size: 2em; 
-    margin-bottom: 10px;  
-}
 
-#pause-menu button {
-    margin: 10px;
-    padding: 10px 20px;
-    background-color: #F28705;
-    border: none;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px; /* Added rounded corners */
-    transition: background-color 0.2s; /* Smooth hover effect */
-}
-
-#pause-menu button:hover {
-    background-color: #F2B807;
-}
 
 /* Ball styling */
 #ball {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 10px;
     height: 10px;
     background: #F2B807;
     border-radius: 50%;
-    will-change: transform;
+    /* will-change: transform; */
 }
 
 /* Paddle styling */
 #paddle {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100px;
     height: 10px;
     background: #F28705;
-    will-change: transform;
+    /* will-change: transform; */
 }
 
 /* Brick styling */
 .brick {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 50px;
     height: 10px;
     background: #BF3B3B;
-    border: none;
-    text-align: center;
-    will-change: transform;
 }
 
 /* Optional: Add game-over / win screen styles */
-.game-message {
+/* .game-message {
     position: absolute;
     width: 100%;
     text-align: center;
@@ -145,7 +124,7 @@ body {
     font-size: 18px;
     color: var(--primary);
     display: none;
-}
+} */
 
 /* instruction to start game  */
 #start-message {
