@@ -61,21 +61,27 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    z-index: 10;
+    z-index: 10; 
 }
 
 /* Styles for the pause menu content */
 #pause-menu {
     text-align: center;
     background-color: rgba(0, 0, 0, 0.7); /* Slightly darker background for the menu box */
-    padding: 20px;
+    padding: 50px; /* DEBUG: Large padding to make it very noticeable */
     border-radius: 10px;
-    color: white;
+    color: yellow; /* DEBUG: Bright yellow text */
+    box-shadow: 0 0 20px lime; /* DEBUG: Bright green glow */
+    /* The display property is controlled by JavaScript, set to flex */
+    display: flex; /* Ensure it's a flex container for its own content */
+    flex-direction: column; /* Stack buttons vertically */
+    justify-content: center;
+    align-items: center;
 }
 
 #pause-menu p {
-    font-size: 1.5em; /* Adjusted for smaller screen but feel free to change */
-    margin-bottom: 20px;
+    font-size: 2em; 
+    margin-bottom: 10px;  
 }
 
 #pause-menu button {
