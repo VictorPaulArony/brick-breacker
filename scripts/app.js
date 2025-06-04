@@ -258,7 +258,7 @@ function gameOver(message = "GAME OVER") {
     isPaused = true; // Ensure game state is paused
     messageBox.innerText = message; // Set the message text
     messageBox.style.display = "block"; // Show the message box
-    document.getElementById("pause-menu").style.display = "none"; // Ensure pause menu is hidden
+    // document.getElementById("pause-menu").style.display = "none"; // Ensure pause menu is hidden
 }
 
 // Handle keyboard controls
