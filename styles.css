@@ -23,20 +23,6 @@ body {
     color: var(--primary);
 }
 
-/* New container for the game area and UI */
-/* .game-container {
-    position: relative; 
-    width: 600px; 
-    height: 500px; 
-    background: var(--gameArea); 
-    border: 4px solid var(--primary);
-    box-shadow: none;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 10px;
-} */
 
 #game-container {
     position: relative;
@@ -51,41 +37,12 @@ body {
     background:var(--gameArea);
     border: 2px solid var(--primary);
     overflow: hidden;
-    /* contain: strict;  */
 }
 
 #ball, #paddle, .brick {
     backface-visibility: hidden;
     will-change: transform; /* Indicates to the browser that these elements will move */
 }
-
-/* Scoreboard / UI Header (optional) */
-/* .ui-header {
-    position: absolute;
-    top: 5px;
-    left: 10px;
-    font-size: 12px;
-    color: var(--primary);
-    text-shadow: none;
-} */
-
-/* #game-message {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(20, 20, 20, 0.8);
-    color: white;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 10; 
-} */
-
-/* Styles for the pause menu content */
-
 
 
 /* Ball styling */
@@ -104,7 +61,6 @@ body {
     width: 100px;
     height: 10px;
     background: #F28705;
-    /* will-change: transform; */
 }
 
 /* Brick styling */
@@ -115,16 +71,6 @@ body {
     background: #BF3B3B;
 }
 
-/* Optional: Add game-over / win screen styles */
-/* .game-message {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    top: 40%;
-    font-size: 18px;
-    color: var(--primary);
-    display: none;
-} */
 
 /* instruction to start game  */
 #start-message {
