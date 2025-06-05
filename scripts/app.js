@@ -5,6 +5,7 @@ const ball = document.getElementById("ball");
 const paddle = document.getElementById("paddle");
 const scoreBoard = document.getElementById("score");
 const messageBox = document.getElementById("game-message");
+const pauseMenu = document.getElementById("pause-menu");
 
 // Game dimensions
 const gameWidth = 600;
@@ -258,7 +259,7 @@ function gameOver(message = "GAME OVER") {
     isPaused = true; // Ensure game state is paused
     messageBox.innerText = message; // Set the message text
     messageBox.style.display = "block"; // Show the message box
-    // document.getElementById("pause-menu").style.display = "none"; // Ensure pause menu is hidden
+    pauseMenu.style.display = "none"; 
 }
 
 // Handle keyboard controls
@@ -273,9 +274,8 @@ function keyDownHandler(e) {
         if (!isPaused) { // Only pause if not already paused
             isPaused = true;
             cancelAnimationFrame(animationId); // Stop the game loop
-            document.getElementById("pause-menu").style.display = "flex"; // Show the pause menu
+            pauseMenu.style.display = "flex";
             messageBox.style.display = "block"; // Ensure the game message overlay is visible
-            messageBox.innerText = ""; // Clear any previous game over/win message
         }
     }
 }
@@ -288,7 +288,7 @@ function keyUpHandler(e) {
 
 function resumeGame() {
     isPaused = false;
-    document.getElementById("pause-menu").style.display = "none";
+    pauseMenu.style.display = "none";
     messageBox.style.display = "none"; // Hide the entire message overlay
     animationId = requestAnimationFrame(moveBall);
 }
@@ -299,9 +299,9 @@ function restartGame() {
 
 function quitGame() {
     isPaused = true;
-    document.getElementById("pause-menu").innerHTML = "<p>Thanks for playing!</p>";
+    messageBox.innerText = "Thanks for playing!";     
     messageBox.style.display = "block"; // Ensure message box is visible
-    document.getElementById("pause-menu").style.display = "none"; // Hide the pause menu
+    pauseMenu.style.display = "none";
 }
 
 // Start the game
