@@ -85,3 +85,33 @@ body {
     border-radius: 10px;
     z-index: 100;
 }
+
+/* styling for the scoreboard  */
+
+#scoreboard {
+    display: flex;
+    justify-content: space-between;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+    font-family: Arial, sans-serif;
+    margin-bottom: 5px;
+}
+
+#timer, #score, #lives {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#timer {
+    color: #ff9900;
+}
+
+#score {
+    color: #F28705;
+}
+
+#lives {
+    color: #F28705;
+}
