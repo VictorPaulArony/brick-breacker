@@ -3,8 +3,12 @@ const gameArea = document.getElementById("game-interface");
 const bricksContainer = document.getElementById("bricks");
 const ball = document.getElementById("ball");
 const paddle = document.getElementById("paddle");
-const scoreBoard = document.getElementById("score");
-const messageBox = document.getElementById("game-message");
+
+// Scoreboard elements
+const timeValue = document.getElementById("time-value");
+const scoreValue = document.getElementById("score-value");
+const livesValue = document.getElementById("lives-value");
+
 
 // Game dimensions
 const gameWidth = 600;
@@ -17,6 +21,8 @@ let y = gameHeight - 50; // Start above paddle
 let dx = -4;
 let dy = -4;
 
+
+
 // Paddle properties
 let paddleWidth = 100;
 let paddleHeight = 10;
@@ -27,7 +33,7 @@ let paddleY = gameHeight - paddleHeight - 30;
 let bricks = [];
 const brickWidth = 50;
 const brickHeight = 10;
-const brickRowsCount = 5;
+const brickRowsCount = 3;
 const brickColumnCount = 9;
 const brickPadding = 10;
 const brickOffsetTop = 50;
@@ -37,9 +43,16 @@ const brickOffsetLeft = 30;
 let rightPressed = false;
 let leftPressed = false;
 let isPaused = false;
+let isGameStarted = false; // New game state variable
+
+// Game metrics
+let score = 0;
+let lives = 3;
+let gameTime = 60; // 60 seconds countdown
+let timerInterval;
+
 
 // Gameplay
-let score = 0;
 let animationId;
 let hasBounced = false;
 
@@ -54,8 +67,8 @@ function drawBricks() {
             let brick = document.createElement("div");
             brick.classList.add("brick");
             brick.style.transform = `translate(${brickX}px, ${brickY}px)`;
-            bricks[c][r] = { 
-                element: brick, 
+            bricks[c][r] = {
+                element: brick,
                 status: 1,
                 x: brickX,
                 y: brickY,
@@ -77,32 +90,84 @@ function movePaddle() {
     paddle.style.transform = `translate(${paddleX}px, ${paddleY}px)`;
 }
 
+// Update score
+function updateScore() {
+    score += 10;
+    scoreValue.textContent = score;
+
+    // Check if all bricks are broken
+    let allBroken = true;
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowsCount; r++) {
+            if (bricks[c][r].status === 1) {
+                allBroken = false;
+                break;
+            }
+        }
+        if (!allBroken) break;
+    }
+
+    if (allBroken) {
+        alert("Congratulations! You've won with a score of " + score);
+        endGame();
+    }
+}
+
+// Start countdown timer
+function startTimer() {
+    timerInterval = setInterval(() => {
+        gameTime--;
+        timeValue.textContent = gameTime;
+
+        if (gameTime <= 0) {
+            alert("Time's up! Your final score is " + score);
+            endGame();
+        }
+    }, 1000);
+}
+
+// End the game
+function endGame() {
+    clearInterval(timerInterval);
+    isPaused = true;
+    document.location.reload();
+}
+
+// Reset ball position
+function resetBall() {
+    x = gameWidth / 2 - ballSize / 2;
+    y = gameHeight - 50;
+    dx = -4;
+    dy = -4;
+    paddleX = (gameWidth - paddleWidth) / 2;
+
+}
+
+
 // Ball movement
 function moveBall() {
-    if (isPaused) {
+    if (isPaused || !isGameStarted) {
         animationId = requestAnimationFrame(moveBall); // Keep loop alive even if paused
         return;
     }
     x += dx;
     y += dy;
 
- 
     checkWallCollision();
     checkPaddleCollision();
     checkBrickCollision();
 
     // GameOver check
-    if (y + ballSize >= gameHeight) {
-        gameOver();
-        return;
-    }
+    // if (y + ballSize >= gameHeight) {
+    //     endGame();
+    //     return;
+    // }
 
     // Updating the ball position using transform
     ball.style.transform = `translate(${x}px, ${y}px)`;
 
     movePaddle();
     animationId = requestAnimationFrame(moveBall);
-
 }
 
 function checkWallCollision() {
@@ -142,7 +207,7 @@ function checkPaddleCollision() {
         const normalizedHitPoint = (hitPoint * 2) - 1; // -1 (left) to 1 (right)
 
         // Adjust this angle factor for desired bounce spread. Math.PI/3 is good for 60-degree max spread.
-        const bounceAngle = normalizedHitPoint * (Math.PI / 3); 
+        const bounceAngle = normalizedHitPoint * (Math.PI / 3);
 
         // Set a consistent speed after paddle hit. You can adjust this.
         const ballSpeed = Math.sqrt(dx * dx + dy * dy); // Maintain current speed, or set a fixed speed like 5
@@ -152,23 +217,36 @@ function checkPaddleCollision() {
         return true; // Indicate that a bounce happened
     }
 
-     // If the ball's top edge has passed the paddle's bottom edge (meaning it missed the paddle)
+    // If the ball's top edge has passed the paddle's bottom edge (meaning it missed the paddle)
     // AND it's still moving downwards (dy > 0)
     // This is the "game over" condition specific to missing the paddle.
     if (dy > 0 && isHorizontallyAligned && ballTop >= paddleBottom) { // Check horizontal alignment for clearer miss
-        gameOver();
+        lives--;
+        livesValue.textContent = lives;
+        if (lives <= 0) {
+            alert("Game Over! Your final score is " + score);
+            endGame();
+            return;
+        }
+        resetBall();
         return false; // Ball missed the paddle
-   }
-   
-   // Fallback game over if it just goes too low, regardless of paddle horizontal alignment
-   if (ballTop > gameHeight) { // Or ballBottom > gameHeight  
-    gameOver();
-       return false;
-   }
+    }
 
-   return false; // No collision or game over yet
+    // Fallback game over if it just goes too low, regardless of paddle horizontal alignment
+    if (ballTop > gameHeight) { // Or ballBottom > gameHeight  
+        lives--;
+        livesValue.textContent = lives;
+        if (lives <= 0) {
+            alert("Game Over! Your final score is " + score);
+            endGame();
+            return;
+        }
+        resetBall();
+        return false;
+    }
+
+    return false; // No collision or game over yet
 }
-
 
 function checkBrickCollision() {
     for (let c = 0; c < brickColumnCount; c++) {
@@ -196,8 +274,6 @@ function checkBrickCollision() {
                     b.status = 0;
                     b.element.style.display = "none";
                     b.element.style.willChange = 'auto';
-                    score += 10;
-                    scoreBoard.innerText = `Score: ${score}`;
 
                     let collisionOccurred = false;
 
@@ -227,8 +303,10 @@ function checkBrickCollision() {
                             x = brickRight;
                         } else {
                             dy = -dy; // Fallback
+                            
                         }
                     }
+                    updateScore();
 
                     // Check for win condition (all bricks broken)
                     let allBricksBroken = true;
@@ -243,7 +321,8 @@ function checkBrickCollision() {
                     }
 
                     if (allBricksBroken) {
-                        gameOver("YOU WIN!");
+                        alert("Congratulations! You've won with a score of " + score);
+                        endGame();
                         return;
                     }
                 }
@@ -253,32 +332,62 @@ function checkBrickCollision() {
 }
 
 
-function gameOver(message = "GAME OVER") {
-    cancelAnimationFrame(animationId);
-    isPaused = true; // Ensure game state is paused
-    messageBox.innerText = message; // Set the message text
-    messageBox.style.display = "block"; // Show the message box
-    // document.getElementById("pause-menu").style.display = "none"; // Ensure pause menu is hidden
+
+// Start the game function
+function startGame() {
+    isGameStarted = true;
+    isPaused = false;
+    document.getElementById("start-message").style.display = "none";
+    startTimer();
+    moveBall();
 }
 
-// Handle keyboard controls
-document.addEventListener("keydown", keyDownHandler);
-document.addEventListener("keyup", keyUpHandler);
+// Initialize scoreboard
+function initScoreboard() {
+    scoreValue.textContent = score;
+    livesValue.textContent = lives;
+    timeValue.textContent = gameTime;
+}
 
+// Handle keyboard controls - UPDATED VERSION
 function keyDownHandler(e) {
-    if (e.key === "ArrowRight") rightPressed = true;
-    else if (e.key === "ArrowLeft") leftPressed = true;
-    else if (e.code === "Space") {
-        // When spacebar is pressed, always pause and show the menu
-        if (!isPaused) { // Only pause if not already paused
+    // Move paddle right
+    if (e.key === "ArrowRight") {
+        rightPressed = true;
+    } else if (e.key === "ArrowLeft") {
+        leftPressed = true;
+    } else if (e.key === "p" || e.key === "P") {
+        // Pause the game (only if game is started and not already paused)
+        if (isGameStarted && !isPaused) {
             isPaused = true;
-            cancelAnimationFrame(animationId); // Stop the game loop
-            document.getElementById("pause-menu").style.display = "flex"; // Show the pause menu
-            messageBox.style.display = "block"; // Ensure the game message overlay is visible
-            messageBox.innerText = ""; // Clear any previous game over/win message
+            cancelAnimationFrame(animationId);
+
+        }
+    } else if (e.key === "c" || e.key === "C") {
+        // Continue the game (only if game is paused)
+        if (isGameStarted && isPaused) {
+            isPaused = false;
+            animationId = requestAnimationFrame(moveBall);
+        }
+    } else if (e.key === "r" || e.key === "R") {
+        // Restart game to start the game afresh
+        document.location.reload(); // Reload page to restart the game
+    } else if (e.key === " " && !isGameStarted) {
+        // Start game with spacebar (only if game hasn't started yet)
+        e.preventDefault();
+        startGame();
+    } else if (e.code === "Space" && isGameStarted) {
+        // Original spacebar pause functionality (when game is running)
+        if (!isPaused) {
+            isPaused = true;
+            cancelAnimationFrame(animationId);
+
         }
     }
 }
+
+document.addEventListener("keydown", keyDownHandler);
+document.addEventListener("keyup", keyUpHandler);
 
 function keyUpHandler(e) {
     if (e.key === "ArrowRight") rightPressed = false;
@@ -286,28 +395,14 @@ function keyUpHandler(e) {
 }
 
 
-function resumeGame() {
-    isPaused = false;
-    document.getElementById("pause-menu").style.display = "none";
-    messageBox.style.display = "none"; // Hide the entire message overlay
-    animationId = requestAnimationFrame(moveBall);
-}
-
-function restartGame() {
-    document.location.reload();
-}
-
-function quitGame() {
-    isPaused = true;
-    document.getElementById("pause-menu").innerHTML = "<p>Thanks for playing!</p>";
-    messageBox.style.display = "block"; // Ensure message box is visible
-    document.getElementById("pause-menu").style.display = "none"; // Hide the pause menu
-}
-
 // Start the game
 function main() {
     drawBricks();
-    moveBall();
-    
+    initScoreboard();
+    resetBall();
+
+    ball.style.transform = `translate(${x}px, ${y}px)`;
+    paddle.style.transform = `translate(${paddleX}px, ${paddleY}px)`;
 }
+
 main();

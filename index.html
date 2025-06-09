@@ -10,23 +10,22 @@
 </head>
 <body>
     <div class="game-container">
+        <div id="scoreboard">
+            <div id="timer">Time: <span id="time-value">60</span></div>
+            <div id="score">Score: <span id="score-value">0</span></div>
+            <div id="lives">Lives: <span id="lives-value">3</span></div>
+        </div>
         <div id="game-interface" class="game-interface">
+            <div id="start-message">
+                <h2>Brick Breaker Game</h2>
+                <p>Press SPACEBAR to start</p>
+                <p>Use Arrow Keys to move paddle</p>
+                <p>P = Pause, C = Continue, R = Restart</p>
+            </div>
             <div id="ball"></div>
             <div id="paddle"></div>
             <div id="bricks"></div>
         </div>
-
-        <div id="score" class="ui-header">Score: 0</div>
-
-        <div id="game-message" class="game-message">
-            <div id="pause-menu" >
-                <p>Game Paused</p>  
-                <button onclick="resumeGame()">Continue</button>
-                <button onclick="restartGame()">Restart</button>
-                <button onclick="quitGame()">Quit</button>
-            </div>  
-        </div>
-        
     </div>
 </body>
 </html>
