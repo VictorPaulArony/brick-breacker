@@ -203,6 +203,7 @@ function checkPaddleCollision() {
         // dy = -dy; // We'll set dy dynamically for angle
 
         // 3. Calculate bounce angle and new dx, dy
+        const direction = dx >= 0 ? 1 : -1; // Keeping track of the direction
         const hitPoint = (ballCenterX - paddleLeft) / paddleWidth; // 0 (left) to 1 (right)
         const normalizedHitPoint = (hitPoint * 2) - 1; // -1 (left) to 1 (right)
 
@@ -212,7 +213,7 @@ function checkPaddleCollision() {
         // Set a consistent speed after paddle hit. You can adjust this.
         const ballSpeed = Math.sqrt(dx * dx + dy * dy); // Maintain current speed, or set a fixed speed like 5
 
-        dx = ballSpeed * Math.sin(bounceAngle);
+        dx = direction * ballSpeed * Math.sin(bounceAngle);
         dy = -ballSpeed * Math.cos(bounceAngle); // Ensure it always goes upwards
         return true; // Indicate that a bounce happened
     }
