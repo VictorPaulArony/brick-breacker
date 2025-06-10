@@ -9,6 +9,9 @@ const timeValue = document.getElementById("time-value");
 const scoreValue = document.getElementById("score-value");
 const livesValue = document.getElementById("lives-value");
 
+// Message/Pause UI elements
+const startMessage = document.getElementById("start-message"); // Main message overlay
+const pauseMenu = document.getElementById("pause-menu"); // The actual pause menu content
 
 // Game dimensions
 const gameWidth = 600;
@@ -20,7 +23,6 @@ let x = gameWidth / 2 - ballSize / 2; // Center ball horizontally
 let y = gameHeight - 50; // Start above paddle
 let dx = -4;
 let dy = -4;
-
 
 
 // Paddle properties
@@ -42,8 +44,11 @@ const brickOffsetLeft = 30;
 // Controls
 let rightPressed = false;
 let leftPressed = false;
-let isPaused = false;
+
+// Game state flags
+let isPaused = true; // game starts paused waiting for the player to press play
 let isGameStarted = false; // New game state variable
+let isGameOver = false; // Indicate whether the game has ended. (win, lose, quit)
 
 // Game metrics
 let score = 0;
@@ -91,8 +96,8 @@ function movePaddle() {
 }
 
 // Update score
-function updateScore() {
-    score += 10;
+function updateScore(points = 10) {
+    score += points;
     scoreValue.textContent = score;
 
     // Check if all bricks are broken
@@ -108,8 +113,7 @@ function updateScore() {
     }
 
     if (allBroken) {
-        alert("Congratulations! You've won with a score of " + score);
-        endGame();
+       gameOver("CONGRATULATIONS! <br> You've won");
     }
 }
 
@@ -120,17 +124,33 @@ function startTimer() {
         timeValue.textContent = gameTime;
 
         if (gameTime <= 0) {
-            alert("Time's up! Your final score is " + score);
-            endGame();
+            gameOver("TIME'S UP!<br>Your final score is " + score);
         }
     }, 1000);
 }
 
 // End the game
-function endGame() {
+function gameOver(messageText = "GAME OVER!") {
+    cancelAnimationFrame(animationId);
     clearInterval(timerInterval);
     isPaused = true;
-    document.location.reload();
+    isGameStarted = false;
+    isGameOver = true;
+
+    pauseMenu.style.display = "none";
+
+    //Hide the ball when the game is over
+    ball.style.display = "none";
+
+    startMessage.innerHTML = `<h2>${messageText}</h2><p>Final Score: ${score} </p>`;
+    startMessage.style.display = "flex";
+
+    //After a short delay, display "Thanks for playing" message
+    setTimeout(displayFinalMessage, 3000);
+}
+
+function displayFinalMessage() {
+    startMessage.innerHTML = `<h2>Thanks for playing!</h2><p>Press SPACE to play again.</p>`; 
 }
 
 // Reset ball position
@@ -141,8 +161,27 @@ function resetBall() {
     dy = -4;
     paddleX = (gameWidth - paddleWidth) / 2;
 
+    ball.style.transform = `translate(${x}px, ${y}px)`;
+    paddle.style.transform = `translate(${paddleX}px, ${paddleY}px)`;
+    
+    // Pause briefly to allow player to prepare
+    isPaused = true;
+    startMessage.innerHTML = `<h2>Ready?</h2><p>Press SPACEBAR to continue</p>`;
+    startMessage.style.display = "flex";
+    pauseMenu.style.display = "none"; 
 }
 
+// Logic for losing a life
+function loseLife() {
+    lives--; // Decrement lives
+    livesValue.textContent = lives; // Update lives display
+
+    if (lives <= 0) {
+        gameOver("GAME OVER!<br>Your final score is " + score); // Game over if no lives left
+    } else {
+        resetBall(); // Reset for next life
+    }
+}
 
 // Ball movement
 function moveBall() {
@@ -150,29 +189,36 @@ function moveBall() {
         animationId = requestAnimationFrame(moveBall); // Keep loop alive even if paused
         return;
     }
+    // Check for wall collisions
+    checkWallCollision();
+
     x += dx;
     y += dy;
 
-    checkWallCollision();
+    // Check for paddle collision
     checkPaddleCollision();
+
+    // Check for brick collision
     checkBrickCollision();
 
-    // GameOver check
-    // if (y + ballSize >= gameHeight) {
-    //     endGame();
-    //     return;
-    // }
+    // If ball goes below game height (missed paddle or fallback)
+    // Lose a life and stop processing for this frame
+    if (y + ballSize >= gameHeight) {
+        loseLife(); 
+        return; 
+    }
 
     // Updating the ball position using transform
     ball.style.transform = `translate(${x}px, ${y}px)`;
-
     movePaddle();
+
     animationId = requestAnimationFrame(moveBall);
 }
 
 function checkWallCollision() {
-    if (x <= 0 || x + ballSize >= gameWidth) dx = -dx;
-    if (y <= 0) dy = -dy;
+    if (x <= 0) { x = 0; dx = -dx; }
+    else if (x + ballSize >= gameWidth) { x = gameWidth - ballSize; dx = -dx; }
+    if (y <= 0) { y = 0; dy = -dy; }
 }
 
 function checkPaddleCollision() {
@@ -206,14 +252,13 @@ function checkPaddleCollision() {
         const hitPoint = (ballCenterX - paddleLeft) / paddleWidth; // 0 (left) to 1 (right)
         const normalizedHitPoint = (hitPoint * 2) - 1; // -1 (left) to 1 (right)
 
-        // Adjust this angle factor for desired bounce spread. Math.PI/3 is good for 60-degree max spread.
         const bounceAngle = normalizedHitPoint * (Math.PI / 3);
 
-        // Set a consistent speed after paddle hit. You can adjust this.
         const ballSpeed = Math.sqrt(dx * dx + dy * dy); // Maintain current speed, or set a fixed speed like 5
 
         dx = -ballSpeed * Math.sin(bounceAngle);
         dy = -ballSpeed * Math.cos(bounceAngle); // Ensure it always goes upwards
+
         return true; // Indicate that a bounce happened
     }
 
@@ -221,38 +266,18 @@ function checkPaddleCollision() {
     // AND it's still moving downwards (dy > 0)
     // This is the "game over" condition specific to missing the paddle.
     if (dy > 0 && isHorizontallyAligned && ballTop >= paddleBottom) { // Check horizontal alignment for clearer miss
-        lives--;
-        livesValue.textContent = lives;
-        if (lives <= 0) {
-            alert("Game Over! Your final score is " + score);
-            endGame();
-            return;
-        }
-        resetBall();
-        return false; // Ball missed the paddle
-    }
-
-    // Fallback game over if it just goes too low, regardless of paddle horizontal alignment
-    if (ballTop > gameHeight) { // Or ballBottom > gameHeight  
-        lives--;
-        livesValue.textContent = lives;
-        if (lives <= 0) {
-            alert("Game Over! Your final score is " + score);
-            endGame();
-            return;
-        }
-        resetBall();
+        loseLife();
         return false;
-    }
-
-    return false; // No collision or game over yet
+        }
+        return false; // no collision
 }
 
+// Logic for brick collision
 function checkBrickCollision() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowsCount; r++) {
             let b = bricks[c][r];
-            if (b.status === 1) {
+            if (b.status === 1) { // Only check active bricks
                 const ballLeft = x;
                 const ballRight = x + ballSize;
                 const ballTop = y;
@@ -271,12 +296,14 @@ function checkBrickCollision() {
                 );
 
                 if (isOverlapping) {
-                    b.status = 0;
-                    b.element.style.display = "none";
-                    b.element.style.willChange = 'auto';
+                    b.status = 0; // Mark brick as broken
+                    b.element.style.display = "none"; // Hide brick element
+                    b.element.style.willChange = 'auto'; // Hint to browser element won't change anymore
 
-                    let collisionOccurred = false;
+                    // Score update and win condition check
+                    updateScore(); 
 
+                    // Rebound logic for ball
                     const prevX = x - dx;
                     const prevY = y - dy;
                     const prevBallLeft = prevX;
@@ -284,47 +311,31 @@ function checkBrickCollision() {
                     const prevBallTop = prevY;
                     const prevBallBottom = prevY + ballSize;
 
-                    if (prevBallBottom <= brickTop && ballBottom > brickTop) {
+                    let collisionOccurred = false;
+
+                    // Determine which side of the brick was hit for more accurate bounce
+                    if (prevBallBottom <= brickTop && ballBottom > brickTop) { // Hit from top of brick
                         dy = -dy;
-                        y = brickTop - ballSize;
+                        y = brickTop - ballSize; // Reposition ball
                         collisionOccurred = true;
-                    } else if (prevBallTop >= brickBottom && ballTop < brickBottom) {
+                    } else if (prevBallTop >= brickBottom && ballTop < brickBottom) { // Hit from bottom of brick
                         dy = -dy;
-                        y = brickBottom;
+                        y = brickBottom; // Reposition ball
                         collisionOccurred = true;
                     }
 
-                    if (!collisionOccurred) {
-                        if (prevBallRight <= brickLeft && ballRight > brickLeft) {
+                    if (!collisionOccurred) { // If not a top/bottom collision, check sides
+                        if (prevBallRight <= brickLeft && ballRight > brickLeft) { // Hit from left side of brick
                             dx = -dx;
-                            x = brickLeft - ballSize;
-                        } else if (prevBallLeft >= brickRight && ballLeft < brickRight) {
+                            x = brickLeft - ballSize; // Reposition ball
+                        } else if (prevBallLeft >= brickRight && ballLeft < brickRight) { // Hit from right side of brick
                             dx = -dx;
-                            x = brickRight;
+                            x = brickRight; // Reposition ball
                         } else {
-                            dy = -dy; // Fallback
-                            
+                            dy = -dy; // Fallback, usually means a corner hit
                         }
                     }
-                    updateScore();
-
-                    // Check for win condition (all bricks broken)
-                    let allBricksBroken = true;
-                    for (let c = 0; c < brickColumnCount; c++) {
-                        for (let r = 0; r < brickRowsCount; r++) {
-                            if (bricks[c][r].status === 1) {
-                                allBricksBroken = false;
-                                break;
-                            }
-                        }
-                        if (!allBricksBroken) break;
-                    }
-
-                    if (allBricksBroken) {
-                        alert("Congratulations! You've won with a score of " + score);
-                        endGame();
-                        return;
-                    }
+                    return; // Only process one brick collision per frame
                 }
             }
         }
@@ -332,14 +343,39 @@ function checkBrickCollision() {
 }
 
 
-
 // Start the game function
 function startGame() {
+    if (isGameOver) {
+        restartGame();
+        return;
+    }
+    if (isGameStarted && !isPaused) { // If already running and not paused, do nothing
+        return;
+    }
     isGameStarted = true;
     isPaused = false;
-    document.getElementById("start-message").style.display = "none";
+    startMessage.style.display = "none"; 
+    pauseMenu.style.display = "none";
+
     startTimer();
     moveBall();
+}
+
+function resumeGame() {
+    if (!isGameOver) { // Only allow resuming if game is not truly over
+        isPaused = false;
+        startMessage.style.display = "none"; // Hide any messages
+        pauseMenu.style.display = "none"; // Hide the pause menu
+        animationId = requestAnimationFrame(moveBall); // Resume the game loop
+    }
+}
+
+function restartGame() {
+    document.location.reload(); // Reloads the page to restart the game
+}
+
+function quitGame() {
+    gameOver("Thanks for playing!"); 
 }
 
 // Initialize scoreboard
@@ -349,60 +385,73 @@ function initScoreboard() {
     timeValue.textContent = gameTime;
 }
 
+// Initial setup on page load
+function initGame() {
+    drawBricks(); // Initializes bricks
+    
+    // Set initial scoreboard values
+    scoreValue.textContent = score;
+    livesValue.textContent = lives;
+    timeValue.textContent = gameTime;
+
+    // Position ball and paddle at start
+    ball.style.transform = `translate(${x}px, ${y}px)`;
+    paddle.style.transform = `translate(${paddleX}px, ${paddleY}px)`;
+
+    // Display initial "Press Space to Start" message
+    startMessage.innerHTML = `<h2>Brick Breaker Game</h2><p>Press SPACEBAR to start and pause the game</p>`;
+    startMessage.style.display = "flex"; // Show the start message
+    pauseMenu.style.display = "none"; // Ensure pause menu is hidden initially
+    isPaused = true; // Start in a paused state
+    isGameStarted = false; // Not started yet
+    isGameOver = false; // Not game over yet
+}
+
+// Handle keyboard controls
+document.addEventListener("keydown", keyDownHandler);
+document.addEventListener("keyup", keyUpHandler);
+
 // Handle keyboard controls - UPDATED VERSION
 function keyDownHandler(e) {
-    // Move paddle right
+    // Prevent default for spacebar to avoid page scrolling if not intended
+    if (e.code === "Space") {
+        e.preventDefault(); 
+    }
+
+    // Paddle movement
     if (e.key === "ArrowRight") {
         rightPressed = true;
     } else if (e.key === "ArrowLeft") {
         leftPressed = true;
-    } else if (e.key === "p" || e.key === "P") {
-        // Pause the game (only if game is started and not already paused)
-        if (isGameStarted && !isPaused) {
+    } 
+    // Spacebar logic for Pause/Start
+    else if (e.code === "Space") {
+        if (isGameOver) {
+            restartGame();
+        }else if (!isGameStarted) { // Game not started yet -> Start the game
+            // initGame();
+            startGame();
+        } else if (isGameStarted && !isPaused ) { // Game is running -> Pause and show menu
             isPaused = true;
-            cancelAnimationFrame(animationId);
-
+            cancelAnimationFrame(animationId); // Stop the game loop
+            pauseMenu.style.display = "flex"; // Show the pause menu
+            startMessage.style.display = "none";
+        } else if (isGameStarted && isPaused) { 
+            if (startMessage.style.display === "flex" && startMessage.innerHTML.includes("Ready?")) {
+                resumeGame();
+            } else {
+                // Do nothing, player must use menu buttons.
+            }
         }
-    } else if (e.key === "c" || e.key === "C") {
-        // Continue the game (only if game is paused)
-        if (isGameStarted && isPaused) {
-            isPaused = false;
-            animationId = requestAnimationFrame(moveBall);
-        }
-    } else if (e.key === "r" || e.key === "R") {
-        // Restart game to start the game afresh
-        document.location.reload(); // Reload page to restart the game
-    } else if (e.key === " " && !isGameStarted) {
-        // Start game with spacebar (only if game hasn't started yet)
-        e.preventDefault();
-        startGame();
-    } else if (e.code === "Space" && isGameStarted) {
-        // Original spacebar pause functionality (when game is running)
-        if (!isPaused) {
-            isPaused = true;
-            cancelAnimationFrame(animationId);
-
+        else if (isGameOver) { // If game is over (win/lose/quit state), Spacebar acts as restart
+            restartGame();
         }
     }
 }
-
-document.addEventListener("keydown", keyDownHandler);
-document.addEventListener("keyup", keyUpHandler);
 
 function keyUpHandler(e) {
     if (e.key === "ArrowRight") rightPressed = false;
     else if (e.key === "ArrowLeft") leftPressed = false;
 }
 
-
-// Start the game
-function main() {
-    drawBricks();
-    initScoreboard();
-    resetBall();
-
-    ball.style.transform = `translate(${x}px, ${y}px)`;
-    paddle.style.transform = `translate(${paddleX}px, ${paddleY}px)`;
-}
-
-main();
+initGame();
