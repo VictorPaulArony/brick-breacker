@@ -18,9 +18,13 @@
         <div id="game-interface" class="game-interface">
             <div id="start-message">
                 <h2>Brick Breaker Game</h2>
-                <p>Press SPACEBAR to start</p>
-                <p>Use Arrow Keys to move paddle</p>
-                <p>P = Pause, C = Continue, R = Restart</p>
+                <p>Press SPACEBAR to start and pause the game</p>
+            </div>
+            <div id="pause-menu">
+                <p>Game Paused</p>
+                <button onclick="resumeGame()">Continue</button>
+                <button onclick="restartGame()">Restart</button>
+                <button onclick="quitGame()">Quit</button>
             </div>
             <div id="ball"></div>
             <div id="paddle"></div>
