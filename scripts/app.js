@@ -119,6 +119,7 @@ function updateScore(points = 10) {
 
 // Start countdown timer
 function startTimer() {
+    clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         gameTime--;
         timeValue.textContent = gameTime;
@@ -169,6 +170,7 @@ function resetBall() {
     startMessage.innerHTML = `<h2>Ready?</h2><p>Press SPACEBAR to continue</p>`;
     startMessage.style.display = "flex";
     pauseMenu.style.display = "none"; 
+    clearInterval(timerInterval);
 }
 
 // Logic for losing a life
@@ -366,6 +368,7 @@ function resumeGame() {
         isPaused = false;
         startMessage.style.display = "none"; // Hide any messages
         pauseMenu.style.display = "none"; // Hide the pause menu
+        startTimer();
         animationId = requestAnimationFrame(moveBall); // Resume the game loop
     }
 }
@@ -405,6 +408,9 @@ function initGame() {
     isPaused = true; // Start in a paused state
     isGameStarted = false; // Not started yet
     isGameOver = false; // Not game over yet
+
+    // Ensure that the game is not running initially
+    clearInterval(timerInterval);
 }
 
 // Handle keyboard controls
@@ -434,6 +440,7 @@ function keyDownHandler(e) {
         } else if (isGameStarted && !isPaused ) { // Game is running -> Pause and show menu
             isPaused = true;
             cancelAnimationFrame(animationId); // Stop the game loop
+            clearInterval(timerInterval); // Stop the timer when pausing
             pauseMenu.style.display = "flex"; // Show the pause menu
             startMessage.style.display = "none";
         } else if (isGameStarted && isPaused) { 
