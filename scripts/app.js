@@ -132,7 +132,7 @@ function startTimer() {
 
 // End the game
 function gameOver(messageText = "GAME OVER!") {
-    cancelAnimationFrame(animationId);
+    stopAnimationLoop(); // Explicitly stop animation loop
     clearInterval(timerInterval);
     isPaused = true;
     isGameStarted = false;
@@ -157,7 +157,7 @@ function displayFinalMessage() {
 // Reset ball position
 function resetBall() {
     // Stop any currently running animation frame if the ball is being reset
-    cancelAnimationFrame(animationId);
+    stopAnimationLoop();
     
     x = gameWidth / 2 - ballSize / 2;
     y = gameHeight - 50;
@@ -186,6 +186,18 @@ function loseLife() {
     } else {
         resetBall(); // Reset for next life
     }
+}
+
+// Helper function to start the animation loop
+function startAnimationLoop(){
+    cancelAnimationFrame(animationId); // To ensure that it cancels all the previous requests.
+    animationId = requestAnimationFrame(moveBall);
+}
+
+// Helper function to stop the animation loop
+function stopAnimationLoop(){
+    cancelAnimationFrame(animationId);
+    animationId = null; //clea he animation id
 }
 
 // Ball movement
@@ -363,7 +375,8 @@ function startGame() {
     pauseMenu.style.display = "none";
 
     startTimer();
-    moveBall();
+    startAnimationLoop();
+    ball.style.display = '';
 }
 
 function resumeGame() {
@@ -372,7 +385,7 @@ function resumeGame() {
         startMessage.style.display = "none"; // Hide any messages
         pauseMenu.style.display = "none"; // Hide the pause menu
         startTimer();
-        animationId = requestAnimationFrame(moveBall); // Resume the game loop
+        startAnimationLoop();
     }
 }
 
@@ -414,6 +427,7 @@ function initGame() {
 
     // Ensure that the game is not running initially
     clearInterval(timerInterval);
+    stopAnimationLoop(); // Ensure animation loop is stopped initially
 }
 
 // Handle keyboard controls
@@ -442,7 +456,7 @@ function keyDownHandler(e) {
             startGame();
         } else if (isGameStarted && !isPaused ) { // Game is running -> Pause and show menu
             isPaused = true;
-            cancelAnimationFrame(animationId); // Stop the game loop
+            stopAnimationLoop(); // Stop the animaation loop explicitly.
             clearInterval(timerInterval); // Stop the timer when pausing
             pauseMenu.style.display = "flex"; // Show the pause menu
             startMessage.style.display = "none";
