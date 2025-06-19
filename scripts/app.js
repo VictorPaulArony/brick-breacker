@@ -156,6 +156,9 @@ function displayFinalMessage() {
 
 // Reset ball position
 function resetBall() {
+    // Stop any currently running animation frame if the ball is being reset
+    cancelAnimationFrame(animationId);
+    
     x = gameWidth / 2 - ballSize / 2;
     y = gameHeight - 50;
     dx = -4;
