@@ -59,15 +59,24 @@ function drawBricks() {
         for (let r = 0; r < brickRowsCount; r++) {
             let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
             let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+
             let brick = document.createElement("div");
             brick.classList.add("brick");
             brick.style.left = brickX + "px";
             brick.style.top = brickY + "px";
-            bricks[c][r] = { element: brick, status: 1 };
+
+            bricks[c][r] = {
+                element: brick,
+                status: 1,
+                x: brickX,
+                y: brickY
+            };
+
             bricksContainer.appendChild(brick);
         }
     }
 }
+
 
 // Paddle movement
 function movePaddle() {
@@ -83,7 +92,7 @@ function movePaddle() {
 function updateScore() {
     score += 10;
     scoreValue.textContent = score;
-    
+
     // Check if all bricks are broken
     let allBroken = true;
     for (let c = 0; c < brickColumnCount; c++) {
@@ -95,7 +104,7 @@ function updateScore() {
         }
         if (!allBroken) break;
     }
-    
+
     if (allBroken) {
         alert("Congratulations! You've won with a score of " + score);
         endGame();
@@ -104,16 +113,21 @@ function updateScore() {
 
 // Start countdown timer
 function startTimer() {
-    timerInterval = setInterval(() => {
-        gameTime--;
-        timeValue.textContent = gameTime;
-        
-        if (gameTime <= 0) {
-            alert("Time's up! Your final score is " + score);
-            endGame();
-        }
-    }, 1000);
+    timerInterval = setInterval(updateTimer, 1000);
 }
+function updateTimer() {
+    if (isPaused) return;
+
+    gameTime--;
+    timeValue.textContent = gameTime;
+
+    if (gameTime <= 0) {
+        alert("Time's up! Your final score is " + score);
+        endGame();
+    }
+}
+
+
 
 // End the game
 function endGame() {
@@ -163,16 +177,14 @@ function moveBall() {
         resetBall();
     }
 
-    // Brick collision
+    // Optimized Brick Collision
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowsCount; r++) {
-            let brick = bricks[c][r];
+            const brick = bricks[c][r];
+
             if (brick.status === 1) {
-                let brickElement = brick.element;
-                let brickRect = brickElement.getBoundingClientRect();
-                let gameRect = gameArea.getBoundingClientRect();
-                let brickX = brickRect.left - gameRect.left;
-                let brickY = brickRect.top - gameRect.top;
+                const brickX = brick.x;
+                const brickY = brick.y;
 
                 if (
                     x + ballSize > brickX &&
@@ -182,12 +194,13 @@ function moveBall() {
                 ) {
                     dy = -dy;
                     brick.status = 0;
-                    brickElement.style.visibility = "hidden";
+                    brick.element.classList.add("hidden"); // use transform-based CSS class
                     updateScore();
                 }
             }
         }
     }
+
 
     // Update ball position
     ball.style.transform = `translate(${x}px, ${y}px)`;
@@ -195,6 +208,7 @@ function moveBall() {
 
     // Request next frame
     animationId = requestAnimationFrame(moveBall);
+
 }
 
 // Handle keyboard controls
@@ -208,8 +222,30 @@ function keyDownHandler(e) {
         leftPressed = true;
     } else if (e.code === "Space" && !isGameStarted) {
         startGame();
+    } else if (e.code === "KeyP") {
+        togglePause();
     }
 }
+function togglePause() {
+    if (!isGameStarted) return;
+
+    if (!isPaused) {
+        isPaused = true;
+        // cancelAnimationFrame(animationId);
+        clearInterval(timerInterval);
+    } else {
+        isPaused = false;
+
+        // Resume animation & timer slightly delayed to avoid dropped frame
+        setTimeout(() => {
+            timerInterval = setInterval(updateTimer, 1000);
+            // animationId = requestAnimationFrame(moveBall);
+            moveBall();
+        }, 50);
+    }
+}
+
+
 
 function keyUpHandler(e) {
     if (e.key === "Right" || e.key === "ArrowRight") {
@@ -221,10 +257,11 @@ function keyUpHandler(e) {
 
 function startGame() {
     isGameStarted = true;
-    document.getElementById("start-message").style.display = "none";
+    document.getElementById("start-message").classList.add("hidden");
     startTimer();
     moveBall();
 }
+
 
 // Initialize scoreboard
 function initScoreboard() {
@@ -238,6 +275,7 @@ function main() {
     drawBricks();
     initScoreboard();
     resetBall();
+    requestAnimationFrame(moveBall);
     ball.style.transform = `translate(${x}px, ${y}px)`;
     paddle.style.transform = `translateX(${paddleX}px)`;
 }
