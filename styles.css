@@ -105,3 +105,22 @@ body {
     border-radius: 10px;
     z-index: 100;
 }
+.brick.hidden {
+    transform: scale(0);
+    pointer-events: none;
+    transition: transform 0.1s linear;
+}
+
+#start-message {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+#start-message.hidden {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
