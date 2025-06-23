@@ -38,8 +38,8 @@ body {
 
 #ball {
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     background: var(--ball);
     border-radius: 50%;
 }
@@ -95,8 +95,8 @@ body {
 
 #start-message {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 40%;
+    left: 30%;
     transform: translate(-50%, -50%);
     font-size: 20px;
     color: white;
@@ -111,16 +111,37 @@ body {
     transition: transform 0.1s linear;
 }
 
-#start-message {
+/* #start-message {
     transition: opacity 0.3s ease, transform 0.3s ease;
     opacity: 1;
     transform: scale(1);
     pointer-events: auto;
-}
+} */
 
 #start-message.hidden {
     opacity: 0;
     transform: scale(0.95);
+    pointer-events: none;
+}
+#gamePause {
+    position: absolute;
+    top: 40%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 100;
+    /* transition: opacity 0.3s ease, transform 0.3s ease; */
+    /* opacity: 1;
+    transform: scale(1);
+    pointer-events: none; */
+}
+#gamePause.hidden {
+    opacity: 0;
+    transform: scale(0);
     pointer-events: none;
 }
 
