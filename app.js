@@ -14,9 +14,9 @@ const gameWidth = 600;
 const gameHeight = 500;
 
 // Ball properties
-let ballSize = 20;
+let ballSize = 10;
 let x = gameWidth / 2 - ballSize / 2; // Center ball horizontally
-let y = gameHeight - 45; // Start above paddle
+let y = gameHeight - 55; // Start above paddle
 let dx = -4;
 let dy = -4;
 
@@ -139,7 +139,7 @@ function endGame() {
 // Reset ball position
 function resetBall() {
     x = gameWidth / 2 - ballSize / 2;
-    y = gameHeight - 45;
+    y = gameHeight - 35;
     dx = -4;
     dy = -4;
     paddleX = (gameWidth - paddleWidth) / 2;
@@ -194,7 +194,7 @@ function moveBall() {
                 ) {
                     dy = -dy;
                     brick.status = 0;
-                    brick.element.classList.add("hidden"); // use transform-based CSS class
+                    brick.element.classList.add("hidden"); 
                     updateScore();
                 }
             }
@@ -207,7 +207,8 @@ function moveBall() {
     movePaddle();
 
     // Request next frame
-    animationId = requestAnimationFrame(moveBall);
+    // animationId = 
+    requestAnimationFrame(moveBall);
 
 }
 
@@ -216,14 +217,24 @@ document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 
 function keyDownHandler(e) {
+    if (e.code === "Space") {
+        e.preventDefault(); // Prevent spacebar from scrolling the page
+    }
+
     if (e.key === "Right" || e.key === "ArrowRight") {
         rightPressed = true;
     } else if (e.key === "Left" || e.key === "ArrowLeft") {
         leftPressed = true;
-    } else if (e.code === "Space" && !isGameStarted) {
-        startGame();
-    } else if (e.code === "KeyP") {
-        togglePause();
+    } else if (e.code === "Space" ) {
+        if (!isGameStarted) {
+            startGame();
+        } else if (isGameStarted && !isPaused) {
+            togglePause();
+        } else if (isGameStarted && isPaused) {
+            togglePause();
+        }
+    } else if (e.code === "KeyR") {
+        endGame();
     }
 }
 function togglePause() {
@@ -231,17 +242,18 @@ function togglePause() {
 
     if (!isPaused) {
         isPaused = true;
-        // cancelAnimationFrame(animationId);
+        // cancelAnimationFrame(moveBall());
+        document.getElementById("gamePause").classList.remove("hidden");
         clearInterval(timerInterval);
     } else {
         isPaused = false;
-
-        // Resume animation & timer slightly delayed to avoid dropped frame
+        // cancelAnimationFrame(moveBall());
+        document.getElementById("gamePause").classList.add("hidden");
         setTimeout(() => {
             timerInterval = setInterval(updateTimer, 1000);
             // animationId = requestAnimationFrame(moveBall);
-            moveBall();
-        }, 50);
+            moveBall()
+        }, 20);
     }
 }
 
@@ -273,9 +285,9 @@ function initScoreboard() {
 // Initialize game
 function main() {
     drawBricks();
-    initScoreboard();
+    // initScoreboard();
+    document.getElementById("gamePause").classList.add("hidden");
     resetBall();
-    requestAnimationFrame(moveBall);
     ball.style.transform = `translate(${x}px, ${y}px)`;
     paddle.style.transform = `translateX(${paddleX}px)`;
 }
