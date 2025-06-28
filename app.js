@@ -24,7 +24,7 @@ let dy = 0;
 let paddleWidth = 100;
 let paddleHeight = 10;
 let paddleX = (gameWidth - paddleWidth) / 2;
-let paddleY = gameHeight - paddleHeight - 10;
+let paddleY = gameHeight - paddleHeight - 3;
 
 // Bricks properties
 let bricks = [];
@@ -170,6 +170,10 @@ function restartGame() {
     // Reset ball and paddle
     resetBall();
     
+    // Force immediate visual update of ball and paddle positions
+    ball.style.transform = `translate(${x}px, ${y}px)`;
+    paddle.style.transform = `translateX(${paddleX}px)`;
+    
     // Redraw bricks
     drawBricks();
     
@@ -178,18 +182,15 @@ function restartGame() {
         cancelAnimationFrame(animationId);
         animationId = null;
     }
-    
-    // Restart game loop
-    lastTime = 0;
-    animationId = requestAnimationFrame(gameLoop);
+
 }
 
 // Reset ball position
 function resetBall() {
     x = gameWidth / 2 - ballSize / 2;
-    y = gameHeight - 30;
-    dx = -2.5;
-    dy = -2.5;
+    y = gameHeight - paddleHeight - 15;
+    dx = -4;
+    dy = -4;
     paddleX = (gameWidth - paddleWidth) / 2;
     needsBallUpdate = true;
     needsPaddleUpdate = true;
