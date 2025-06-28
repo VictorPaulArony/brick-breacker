@@ -16,10 +16,12 @@
    
     <div id="game-interface" class="game-interface">
         <div id="start-message">Press SPACE to start the game!</div>
-        <div class="gamePause" id="gamePause" >
-            <p>Game Paused</p>
-            <button id="resume-button" onclick="togglePause()">Resume</button>
-            <button id="restart-button" onclick="endGame()">Restart</button>
+        <div class="gamePause" id="gamePause">
+            <h2>Game Paused</h2>
+            <div class="pause-menu">
+                <button id="continue-button" onclick="togglePause()">Continue</button>
+                <button id="restart-button" onclick="restartGame()">Restart</button>
+            </div>
         </div>
         <div id="ball"></div>
         <div id="paddle"></div>
