@@ -188,7 +188,7 @@ function restartGame() {
 // Reset ball position
 function resetBall() {
     x = gameWidth / 2 - ballSize / 2;
-    y = gameHeight - paddleHeight - 15;
+    y = gameHeight - paddleHeight - 20;
     dx = -4;
     dy = -4;
     paddleX = (gameWidth - paddleWidth) / 2;
