@@ -30,6 +30,11 @@ body {
     margin: 0 auto;
 }
 
+#ball, #paddle, .brick {
+    backface-visibility: hidden;
+    will-change: transform; 
+}
+
 .game-interface {
     position: relative;
     width: 600px;
@@ -37,11 +42,23 @@ body {
     background:var(--gameArea);
     border: 2px solid var(--primary);
     overflow: hidden;
+    /* contain: strict;  */
+    transition: none;
 }
 
+<<<<<<< HEAD
 #ball, #paddle, .brick {
     backface-visibility: hidden;
     will-change: transform; /* Indicates to the browser that these elements will move */
+=======
+#ball {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--ball);
+    border-radius: 50%;
+    transition: none;
+>>>>>>> frames
 }
 
 
@@ -60,7 +77,13 @@ body {
     position: absolute;
     width: 100px;
     height: 10px;
+<<<<<<< HEAD
     background: #F28705;
+=======
+    background-color: var(--paddle);
+    bottom: 3px;
+    transition: none;
+>>>>>>> frames
 }
 
 /* Brick styling */
@@ -68,6 +91,7 @@ body {
     position: absolute;
     width: 50px;
     height: 10px;
+<<<<<<< HEAD
     background: #BF3B3B;
 }
 
@@ -177,4 +201,187 @@ body {
 
 #lives {
     color: #F28705;
+=======
+    background-color: var(--brick);
+    transition: none;
+>>>>>>> frames
 }
+#game-container {
+    position: relative;
+    width: 600px;
+    margin: 0 auto;
+}
+
+#scoreboard {
+    display: flex;
+    justify-content: space-between;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+    font-family: Arial, sans-serif;
+    margin-bottom: 5px;
+}
+
+#timer, #score, #lives {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#timer {
+    color: #ff9900;
+}
+
+#score {
+    color: #33cc33;
+}
+
+#lives {
+    color: #ff3333;
+}
+
+#start-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: white;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    z-index: 100;
+    /* Optimize for smooth transitions */
+    /* transition: opacity 0.3s ease, transform 0.3s ease; */
+    /* Force GPU acceleration */
+    transform: translate(-50%, -50%) translateZ(0);
+    -webkit-transform: translate(-50%, -50%) translateZ(0);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    animation: pulse 2s infinite;
+}
+
+#start-message::before {
+    content: "🎮";
+    display: block;
+    font-size: 48px;
+    margin-bottom: 15px;
+    animation: bounce 1.5s infinite;
+}
+
+#start-message.hidden {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+    -webkit-transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+    pointer-events: none;
+}
+
+/* Pulsing animation for the start message */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+/* Bouncing animation for the game controller emoji */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+#gamePause {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: white;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    z-index: 100;
+    
+}
+
+#gamePause h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #ff9900;
+    text-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+}
+
+.pause-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.pause-menu button {
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    /* transition: all 0.2s ease; */
+    min-width: 120px;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+#continue-button {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+#continue-button:hover {
+    background: linear-gradient(135deg, #45a049, #4CAF50);
+    transform: translateY(-2px) translateZ(0);
+    -webkit-transform: translateY(-2px) translateZ(0);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+#restart-button {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+}
+
+#restart-button:hover {
+    background: linear-gradient(135deg, #d32f2f, #f44336);
+    transform: translateY(-2px) translateZ(0);
+    -webkit-transform: translateY(-2px) translateZ(0);
+    box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+}
+
+#gamePause.hidden {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+    -webkit-transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+    pointer-events: none;
+}
+
+.brick.hidden {
+    display: none;
+}
+
+
