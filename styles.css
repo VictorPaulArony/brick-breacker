@@ -1,11 +1,11 @@
-:root {
-    --gameArea: #04588C;
-    --background: #111;
-    --primary: #00FFCC;
-    --ui-font: 'Press Start 2P', cursive;
+:root{
+    --gameArea:#000000;
+    --brick: #ffa500;
+    --paddle: #0000ff;
+    --ball : #ff0000;
+    --background: #222;
+    --primary: #ffffff;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 * {
     margin: 0;
@@ -19,15 +19,6 @@ body {
     align-items: center;
     height: 100vh;
     background-color: var(--background);
-    font-family: var(--ui-font);
-    color: var(--primary);
-}
-
-
-#game-container {
-    position: relative;
-    width: 600px;
-    margin: 0 auto;
 }
 
 #ball, #paddle, .brick {
@@ -46,11 +37,6 @@ body {
     transition: none;
 }
 
-<<<<<<< HEAD
-#ball, #paddle, .brick {
-    backface-visibility: hidden;
-    will-change: transform; /* Indicates to the browser that these elements will move */
-=======
 #ball {
     position: absolute;
     width: 12px;
@@ -58,153 +44,23 @@ body {
     background: var(--ball);
     border-radius: 50%;
     transition: none;
->>>>>>> frames
 }
 
-
-/* Ball styling */
-#ball {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: #F2B807;
-    border-radius: 50%;
-    /* will-change: transform; */
-}
-
-/* Paddle styling */
 #paddle {
     position: absolute;
     width: 100px;
     height: 10px;
-<<<<<<< HEAD
-    background: #F28705;
-=======
     background-color: var(--paddle);
     bottom: 3px;
     transition: none;
->>>>>>> frames
 }
 
-/* Brick styling */
 .brick {
     position: absolute;
     width: 50px;
     height: 10px;
-<<<<<<< HEAD
-    background: #BF3B3B;
-}
-
-/* Styling the start message */
-
-#start-message {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    color: white;
-    background: rgba(0, 0, 0, 0.85);
-    padding: 20px;
-    text-align: center;
-    border-radius: 10px;
-    z-index: 100;
-}
-
-#start-message h2 {
-    margin-bottom: 10px;
-    font-size: 1.8em;
-    color: var(--primary);
-}
-#start-message p {
-    font-size: 0.8em;
-    color: white;
-}
-
-/* styling for the scoreboard  */
-
-#scoreboard {
-    display: flex;
-    justify-content: space-between;
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    border-radius: 5px 5px 0 0;
-    font-family: Arial, sans-serif;
-    margin-bottom: 5px;
-}
-
-/* Pause menu overlay (hidden by default) */
-#pause-menu {
-    position: absolute;
-    top: 0; /* Cover entire parent */
-    left: 0; /* Cover entire parent */
-    width: 100%;
-    height: 100%;
-    display: none; /* IMPORTANT: Hidden by default in CSS, shown by JS */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.95); /* Even darker overlay for pause */
-    z-index: 101; /* Higher z-index than start-message/game over message */
-    text-align: center;
-    color: white;
-}
-
-#pause-menu p {
-    font-size: 1.5em;
-    margin-bottom: 20px;
-    color: var(--primary);
-}
-
-#pause-menu button {
-    margin: 10px;
-    padding: 12px 25px; /* Slightly larger buttons */
-    background-color: var(--paddle-color);
-    border: none;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.2s, transform 0.1s;
-    font-family: var(--ui-font); /* Apply game font to buttons */
-    font-size: 0.8em;
-}
-
-#pause-menu button:hover {
-    background-color: var(--ball-color);
-    transform: translateY(-2px);
-}
-
-#pause-menu button:active {
-    transform: translateY(0);
-}
-
-
-#timer, #score, #lives {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-#timer {
-    color: #ff9900;
-}
-
-#score {
-    color: #F28705;
-}
-
-#lives {
-    color: #F28705;
-=======
     background-color: var(--brick);
     transition: none;
->>>>>>> frames
 }
 #game-container {
     position: relative;
@@ -383,5 +239,3 @@ body {
 .brick.hidden {
     display: none;
 }
-
-
